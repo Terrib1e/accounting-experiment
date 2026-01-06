@@ -1,0 +1,78 @@
+<div class="p-6 h-full flex flex-col">
+
+  <!-- Header / Filters -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Workflow Board</h1>
+
+    <div class="flex gap-4">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-64">
+        <mat-label>Workflow</mat-label>
+        <mat-select [value]="selectedWorkflowId" (selectionChange)="onWorkflowChange($event.value)">
+          <mat-option *ngFor="let wf of workflows" [value]="wf.id">
+            {{ wf.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="openCreateJobDialog()">
+        <mat-icon>add</mat-icon>
+        New Job
+      </button>
+    </div>
+  </div>
+
+  <!-- Kanban Board -->
+  <div class="flex-1 overflow-x-auto min-h-0" cdkDropListGroup>
+    <div class="flex gap-4 h-full min-w-max pb-4">
+
+      <!-- Columns -->
+      <div *ngFor="let stage of getOrderedStages()" class="w-80 flex-shrink-0 flex flex-col bg-gray-100 rounded-lg p-3 h-full max-h-full">
+
+        <!-- Column Header -->
+        <div class="flex justify-between items-center mb-3 px-1">
+          <h3 class="font-semibold text-gray-700">{{ stage.name }}</h3>
+          <span class="bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full">
+            {{ columns[stage.id] ? columns[stage.id].length : 0 }}
+          </span>
+        </div>
+
+        <!-- Drop List -->
+        <div
+          cdkDropList
+          [id]="stage.id"
+          [cdkDropListData]="columns[stage.id]"
+          class="flex-1 overflow-y-auto space-y-3 min-h-[100px]"
+          (cdkDropListDropped)="drop($event)">
+
+          <!-- Job Card -->
+          <mat-card *ngFor="let job of columns[stage.id]" cdkDrag class="cursor-move hover:shadow-md transition-shadow" (click)="openJobDetail(job)">
+            <mat-card-content class="p-4 !pb-4">
+              <div class="flex justify-between items-start mb-2">
+                <span class="text-sm font-medium text-blue-600">{{ job.contactName }}</span>
+                <!-- <mat-icon class="text-gray-400 text-sm h-4 w-4">more_horiz</mat-icon> -->
+              </div>
+
+              <h4 class="font-bold text-gray-800 mb-1">{{ job.name }}</h4>
+
+              <div class="flex items-center text-gray-500 text-xs mt-3 gap-3">
+                <span *ngIf="job.dueDate" class="flex items-center gap-1">
+                  <mat-icon class="text-xs h-3 w-3">calendar_today</mat-icon>
+                  {{ job.dueDate | date:'MM/dd' }}
+                </span>
+
+                <span *ngIf="job.assigneeId" class="flex items-center gap-1">
+                   <mat-icon class="text-xs h-3 w-3">person</mat-icon>
+                   <!-- User Avatar placeholder -->
+                   Assignee
+                </span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

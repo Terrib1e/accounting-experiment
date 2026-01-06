@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: 11-create-organization-settings-table
+      author: antigravity
+      changes:
+        - createTable:
+            tableName: organization_settings
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+              - column:
+                  name: org_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tax_id
+                  type: varchar(50)
+              - column:
+                  name: base_currency
+                  type: varchar(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: address
+                  type: text
+              - column:
+                  name: phone
+                  type: varchar(50)
+              - column:
+                  name: email
+                  type: varchar(100)

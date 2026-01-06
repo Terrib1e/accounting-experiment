@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased text-slate-900 bg-[#f8fafc] selection:bg-primary-100 selection:text-primary-900;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight text-slate-900;
+  }
+}
+
+/* ============================================
+   Glassmorphism System
+   ============================================ */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-glass border border-white/40 shadow-glass;
+}
+
+.glass-dark {
+  @apply bg-slate-900/90 backdrop-blur-glass border-r border-white/5 shadow-glass;
+}
+
+.glass-button {
+  @apply bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-200;
+}
+
+/* ============================================
+   Enhanced Cards
+   ============================================ */
+.premium-card {
+  @apply bg-white rounded-2xl border border-slate-200/60 shadow-card transition-all duration-300;
+}
+
+.premium-card:hover {
+  @apply shadow-card-hover -translate-y-1 border-primary-200/50;
+}
+
+/* ============================================
+   Refined Status Badges
+   ============================================ */
+.status-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider space-x-1;
+}
+
+.status-badge.posted { @apply bg-accent-100 text-accent-700; }
+.status-badge.approved { @apply bg-primary-100 text-primary-700; }
+.status-badge.draft { @apply bg-slate-100 text-slate-600; }
+.status-badge.void { @apply bg-red-100 text-red-700; }
+
+/* ============================================
+   Premium Tables
+   ============================================ */
+.table-container {
+  @apply overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-premium;
+}
+
+.table-premium {
+  @apply w-full text-left border-collapse;
+}
+
+.table-premium thead th {
+  @apply px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50 border-b border-slate-100/60;
+}
+
+.table-premium tbody tr {
+  @apply transition-colors duration-200 border-b border-slate-50 last:border-0;
+}
+
+.table-premium tbody tr:hover {
+  @apply bg-slate-50/80;
+}
+
+.table-premium tbody td {
+  @apply px-6 py-4 text-sm text-slate-600;
+}
+
+/* ============================================
+   Input Styling
+   ============================================ */
+.form-input-premium {
+  @apply w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/30 text-slate-900;
+  @apply transition-all duration-200 placeholder-slate-400 font-medium;
+  @apply focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 focus:bg-white;
+}
+
+/* ============================================
+   Button Styling
+   ============================================ */
+.btn-primary {
+  @apply px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold shadow-lg shadow-primary-500/30 transition-all duration-200 hover:shadow-primary-500/50 active:scale-95;
+}
+
+.btn-secondary {
+    @apply px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl font-semibold shadow-sm transition-all duration-200 hover:border-slate-300 active:scale-95;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+/* Animations are defined in tailwind.config.js */
+
+/* ============================================
+   Angular Material Overrides (Modals)
+   ============================================ */
+
+/* ============================================
+   Angular Material Overrides (Modals)
+   ============================================ */
+/* ============================================
+   Angular Material Overrides (Modals)
+   ============================================ */
+.mat-mdc-dialog-container {
+  /* Force the container to be solid white using the standard variable */
+  --mdc-dialog-container-color: #ffffff !important;
+  --mdc-dialog-container-elevation: none !important;
+  padding: 0 !important;
+  border-radius: 1.5rem !important; /* rounded-3xl */
+  overflow: hidden !important; /* Fix for rounded corners */
+  background-color: #ffffff !important; /* Fallback */
+}
+
+.mat-mdc-dialog-surface {
+  background-color: #ffffff !important; /* Solid white */
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  @apply border border-slate-200 shadow-2xl shadow-slate-900/40 rounded-3xl overflow-hidden;
+}
+
+.cdk-overlay-dark-backdrop {
+  background: rgba(15, 23, 42, 0.6) !important; /* Darker slate-900 for better contrast */
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  opacity: 1 !important;
+}
+
+/* Header/Title */
+[mat-dialog-title] {
+  @apply m-0 p-6 text-xl font-bold text-slate-800 border-b border-slate-100 bg-white sticky top-0 z-10 !important;
+  @apply flex items-center justify-between;
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: -0.025em;
+}
+
+/* Content Area */
+.mat-mdc-dialog-content {
+  max-height: 80vh !important;
+  @apply p-6 !important;
+  @apply text-slate-600 leading-relaxed;
+  overflow-y: auto !important; /* Ensure scrolling */
+  flex: 1 1 auto; /* Allow growth within flex container */
+}
+
+/* Actions Footer */
+.mat-mdc-dialog-actions {
+  @apply p-6 pt-4 border-t border-slate-100 bg-slate-50 !important; /* Solid background */
+  gap: 0.75rem;
+  justify-content: flex-end !important;
+  flex: 0 0 auto; /* Prevent shrinking */
+}
+
+/* Action Buttons within Dialogs */
+.mat-mdc-dialog-actions button[mat-button],
+.mat-mdc-dialog-actions button[mat-stroked-button] {
+  @apply px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 active:scale-95 text-sm;
+}
+
+/* Cancel / Secondary Action */
+.mat-mdc-dialog-actions button[mat-button] {
+  @apply text-slate-600 hover:text-slate-800 hover:bg-slate-100;
+}
+
+/* Primary Action */
+.mat-mdc-dialog-actions button[mat-raised-button],
+.mat-mdc-dialog-actions button[color="primary"] {
+  @apply bg-primary-600 text-white shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 hover:bg-primary-700 !important;
+}
+
+/* Scrollbar Refinement */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300/50 rounded-full hover:bg-slate-400;
+}
+
+/* Standardized Premium Dialog Class */
+.premium-dialog .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: #ffffff !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.premium-dialog .mat-mdc-dialog-surface {
+    background-color: #ffffff !important;
+    overflow: hidden !important;
+    border-radius: 1.5rem !important;
+}
+
+/* Fix for Datepicker Z-Index in Modals */
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+    z-index: 9999 !important;
+}
+
+.mat-datepicker-content {
+    background-color: white;
+    @apply shadow-xl border border-slate-200 rounded-xl;
+}
+
+/* ============================================
+   Form Field Fixes for Modals
+   ============================================ */
+.premium-dialog .mat-mdc-form-field {
+    width: 100%;
+}
+
+/* Reset line-height to prevent "leading-relaxed" from breaking label positioning */
+.premium-dialog .mat-mdc-form-field-subscript-wrapper,
+.premium-dialog .mat-mdc-text-field-wrapper,
+.premium-dialog .mdc-text-field__input,
+.premium-dialog .mat-mdc-form-field-label {
+    line-height: normal !important;
+}
+
+/* Ensure labels don't get struck through by the outline border */
+.premium-dialog .mat-mdc-floating-label {
+    background-color: white;
+    padding: 0 4px; /* Add some breathing room around the text */
+    margin-left: -4px; /* Compensate for padding to keep alignment */
+    z-index: 10; /* Ensure it sits on top of the border if notch fails */
+}
+
+/* Adjust the input padding inside standard outline to match premium look if needed */
+.premium-dialog .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-text-field__input {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+/* Fix for "Text half into other fields" - ensure proper spacing */
+.premium-dialog .mat-mdc-form-field-subscript-wrapper {
+    /* If dynamic sizing is used, sometimes it helps to ensure it takes no space if empty */
+    position: absolute;
+}

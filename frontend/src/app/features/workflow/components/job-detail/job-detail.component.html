@@ -1,0 +1,105 @@
+<div class="container" *ngIf="!isLoading && job; else loading">
+
+  <!-- Header -->
+  <div class="header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-info">
+      <h1>{{ job.name }}</h1>
+      <div class="meta">
+        <mat-chip-set>
+          <mat-chip>{{ job.workflowName }}</mat-chip>
+          <mat-chip highlighted>{{ job.currentStageName }}</mat-chip>
+        </mat-chip-set>
+      </div>
+    </div>
+  </div>
+
+  <!-- Job Info Card -->
+  <mat-card class="info-card">
+    <mat-card-content>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Client</span>
+          <span class="value">{{ job.contactName }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Due Date</span>
+          <span class="value">{{ job.dueDate ? (job.dueDate | date:'mediumDate') : 'Not set' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Assignee</span>
+          <span class="value">{{ job.assigneeId || 'Unassigned' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Progress</span>
+          <span class="value">{{ completedCount }} / {{ tasks.length }} tasks</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tabs for Tasks and Documents -->
+  <mat-tab-group class="content-tabs">
+    <!-- Tasks Tab -->
+    <mat-tab label="Tasks">
+      <div class="tab-content">
+        <!-- Add Task -->
+        <div class="add-task-row">
+          <mat-form-field appearance="outline" class="flex-1">
+            <mat-label>New Task</mat-label>
+            <input matInput [(ngModel)]="newTaskTitle" placeholder="Enter task title" (keyup.enter)="addTask()">
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="addTask()" [disabled]="!newTaskTitle.trim()">
+            <mat-icon>add</mat-icon> Add
+          </button>
+        </div>
+
+        <!-- Task List -->
+        <div class="task-list">
+          <mat-card *ngFor="let task of tasks" class="task-card" [class.completed]="task.isCompleted">
+            <mat-card-content class="task-content">
+              <mat-checkbox
+                [checked]="task.isCompleted"
+                (change)="toggleTaskCompletion(task)"
+                color="primary">
+              </mat-checkbox>
+              <div class="task-info">
+                <span class="task-title" [class.line-through]="task.isCompleted">{{ task.title }}</span>
+                <span class="task-description" *ngIf="task.description">{{ task.description }}</span>
+              </div>
+              <span class="task-due" *ngIf="task.dueDate">{{ task.dueDate | date:'shortDate' }}</span>
+            </mat-card-content>
+          </mat-card>
+
+          <p *ngIf="tasks.length === 0" class="empty-state">No tasks yet. Add one above!</p>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Documents Tab -->
+    <mat-tab label="Documents">
+      <div class="tab-content">
+        <app-document-upload
+          [jobId]="job.id"
+          (uploaded)="onDocumentUploaded($event)">
+        </app-document-upload>
+
+        <mat-divider class="my-4"></mat-divider>
+
+        <app-document-list
+          #documentList
+          [jobId]="job.id">
+        </app-document-list>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+</div>
+
+<ng-template #loading>
+  <div class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+</ng-template>

@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>{{ isEditing ? 'Edit Job' : 'Create New Job' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" id="job-form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 min-w-[400px] py-2">
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Job Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g., John Doe - 2024 Tax Return">
+      <mat-error *ngIf="form.get('name')?.hasError('required')">Job name is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Workflow</mat-label>
+      <mat-select formControlName="workflowId">
+        <mat-option *ngFor="let wf of workflows" [value]="wf.id">
+          {{ wf.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('workflowId')?.hasError('required')">Please select a workflow</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Client</mat-label>
+      <mat-select formControlName="contactId">
+        <mat-option *ngFor="let contact of contacts" [value]="contact.id">
+          {{ contact.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('contactId')?.hasError('required')">Please select a client</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Due Date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="dueDate" placeholder="Due Date">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Assignee would need a user list, placeholder for now -->
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Assignee ID (optional)</mat-label>
+      <input matInput formControlName="assigneeId" placeholder="User ID">
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || isLoading">
+    {{ isLoading ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
+  </button>
+</mat-dialog-actions>

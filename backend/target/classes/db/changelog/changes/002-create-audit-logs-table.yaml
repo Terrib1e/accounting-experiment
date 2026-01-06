@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2-create-audit-logs-table
+      author: antigravity
+      changes:
+        - createTable:
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: action
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: uuid
+              - column:
+                  name: username
+                  type: varchar(255)
+              - column:
+                  name: timestamp
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ip_address
+                  type: varchar(45)
+              - column:
+                  name: user_agent
+                  type: varchar(255)
+              - column:
+                  name: details
+                  type: jsonb
+              - column:
+                  name: old_value
+                  type: jsonb
+              - column:
+                  name: new_value
+                  type: jsonb
+              - column:
+                  name: correlation_id
+                  type: varchar(255)

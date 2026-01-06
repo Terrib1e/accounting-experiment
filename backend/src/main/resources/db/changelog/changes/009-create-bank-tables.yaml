@@ -1,0 +1,139 @@
+databaseChangeLog:
+  - changeSet:
+      id: 9-create-bank-tables
+      author: antigravity
+      changes:
+        - createTable:
+            tableName: bank_accounts
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_number
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bank_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: currency
+                  type: varchar(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: gl_account_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: last_reconciled_date
+                  type: date
+              - column:
+                  name: last_reconciled_balance
+                  type: decimal(19, 4)
+        - addForeignKeyConstraint:
+            baseTableName: bank_accounts
+            baseColumnNames: gl_account_id
+            referencedTableName: accounts
+            referencedColumnNames: id
+            constraintName: fk_bank_gl_account
+        - createTable:
+            tableName: bank_transactions
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+              - column:
+                  name: bank_account_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: decimal(19, 4)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reference
+                  type: varchar(255)
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: matched_journal_entry_id
+                  type: uuid
+        - addForeignKeyConstraint:
+            baseTableName: bank_transactions
+            baseColumnNames: bank_account_id
+            referencedTableName: bank_accounts
+            referencedColumnNames: id
+            constraintName: fk_bank_tx_account
+            onDelete: CASCADE
+        - createIndex:
+            tableName: bank_transactions
+            indexName: idx_bank_tx_date
+            columns:
+              - column:
+                  name: date

@@ -1,0 +1,51 @@
+.container {
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.workflow-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.workflow-name .description {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.actions-col {
+  width: 120px;
+  text-align: right;
+}
+
+mat-chip.initial {
+  background-color: #dbeafe !important;
+  color: #1d4ed8 !important;
+}
+
+mat-chip.final {
+  background-color: #dcfce7 !important;
+  color: #16a34a !important;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px;
+  color: #9ca3af;
+}

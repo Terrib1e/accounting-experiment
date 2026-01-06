@@ -1,0 +1,209 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-workflow-tables
+      author: accounting-platform
+      changes:
+        # Workflows Table
+        - createTable:
+            tableName: workflows
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+
+        # Workflow Stages Table
+        - createTable:
+            tableName: workflow_stages
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+              - column:
+                  name: workflow_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_workflow_stage_workflow
+                    references: workflows(id)
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_index
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_initial
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_final
+                  type: boolean
+                  constraints:
+                    nullable: false
+
+        # Jobs Table
+        - createTable:
+            tableName: jobs
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: workflow_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_job_workflow
+                    references: workflows(id)
+              - column:
+                  name: current_stage_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_job_stage
+                    references: workflow_stages(id)
+              - column:
+                  name: contact_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_job_contact
+                    references: contacts(id)
+              - column:
+                  name: due_date
+                  type: date
+              - column:
+                  name: assignee_id
+                  type: varchar(255)
+
+        # Tasks Table
+        - createTable:
+            tableName: tasks
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: job_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_task_job
+                    references: jobs(id)
+              - column:
+                  name: is_completed
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: due_date
+                  type: date
+              - column:
+                  name: assignee_id
+                  type: varchar(255)

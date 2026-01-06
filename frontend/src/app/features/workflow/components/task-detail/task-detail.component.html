@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>{{ isNew ? 'Create Task' : 'Edit Task' }}</h2>
+<mat-dialog-content class="w-full min-w-[400px]">
+  <div class="flex flex-col gap-4">
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Task Title</mat-label>
+      <input matInput [(ngModel)]="task.title" placeholder="e.g. Gather Documents" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Description</mat-label>
+      <textarea matInput [(ngModel)]="task.description" rows="3"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Due Date</mat-label>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="task.dueDate">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <div *ngIf="!isNew" class="py-2">
+        <mat-checkbox [(ngModel)]="task.isCompleted">Mark as Completed</mat-checkbox>
+    </div>
+
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" (click)="save()" [disabled]="!task.title">Save</button>
+</mat-dialog-actions>

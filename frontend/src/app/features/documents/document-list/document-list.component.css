@@ -1,0 +1,61 @@
+.document-list-container {
+  min-height: 100px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.file-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-icon {
+  color: #6b7280;
+}
+
+.file-icon.pdf {
+  color: #ef4444;
+}
+
+.file-icon.image {
+  color: #10b981;
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.file-description {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.text-muted {
+  color: #9ca3af;
+}
+
+.actions-col {
+  width: 100px;
+  text-align: right;
+}
+
+.empty-state {
+  text-align: center;
+  color: #9ca3af;
+  padding: 32px;
+}

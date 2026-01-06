@@ -1,0 +1,113 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8-create-expenses-table
+      author: antigravity
+      changes:
+        - createTable:
+            tableName: expenses
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+              - column:
+                  name: vendor_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: due_date
+                  type: date
+              - column:
+                  name: reference_number
+                  type: varchar(255)
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: currency
+                  type: varchar(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_amount
+                  type: decimal(19, 4)
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: notes
+                  type: text
+        - addForeignKeyConstraint:
+            baseTableName: expenses
+            baseColumnNames: vendor_id
+            referencedTableName: contacts
+            referencedColumnNames: id
+            constraintName: fk_expense_vendor
+        - createTable:
+            tableName: expense_lines
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: expense_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: amount
+                  type: decimal(19, 4)
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expense_account_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: expense_lines
+            baseColumnNames: expense_id
+            referencedTableName: expenses
+            referencedColumnNames: id
+            constraintName: fk_expense_lines_expense
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: expense_lines
+            baseColumnNames: expense_account_id
+            referencedTableName: accounts
+            referencedColumnNames: id
+            constraintName: fk_expense_lines_account

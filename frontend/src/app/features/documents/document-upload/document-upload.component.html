@@ -1,0 +1,61 @@
+<div class="upload-container">
+  <!-- Drop Zone -->
+  <div
+    class="drop-zone"
+    [class.drag-over]="dragOver"
+    [class.has-file]="selectedFile"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)">
+
+    <ng-container *ngIf="!selectedFile">
+      <mat-icon class="upload-icon">cloud_upload</mat-icon>
+      <p class="drop-text">Drag & drop a file here, or</p>
+      <label class="file-input-label">
+        <input type="file" (change)="onFileSelected($event)" hidden>
+        <span class="browse-btn">Browse</span>
+      </label>
+    </ng-container>
+
+    <ng-container *ngIf="selectedFile">
+      <mat-icon class="file-icon">description</mat-icon>
+      <div class="file-info">
+        <span class="file-name">{{ selectedFile.name }}</span>
+        <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
+      </div>
+      <button mat-icon-button (click)="clearFile()" class="clear-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </ng-container>
+  </div>
+
+  <!-- Metadata Fields -->
+  <div class="metadata-row" *ngIf="selectedFile">
+    <mat-form-field appearance="outline" class="flex-1">
+      <mat-label>Category</mat-label>
+      <mat-select [(ngModel)]="category">
+        <mat-option *ngFor="let cat of categories" [value]="cat">{{ cat }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="flex-2">
+      <mat-label>Description (optional)</mat-label>
+      <input matInput [(ngModel)]="description" placeholder="Brief description">
+    </mat-form-field>
+  </div>
+
+  <!-- Upload Progress -->
+  <mat-progress-bar *ngIf="uploading" mode="determinate" [value]="uploadProgress"></mat-progress-bar>
+
+  <!-- Upload Button -->
+  <button
+    mat-raised-button
+    color="primary"
+    *ngIf="selectedFile"
+    (click)="upload()"
+    [disabled]="uploading"
+    class="upload-btn">
+    <mat-icon>upload</mat-icon>
+    {{ uploading ? 'Uploading ' + uploadProgress + '%' : 'Upload' }}
+  </button>
+</div>

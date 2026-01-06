@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-contact-id-to-users
+      author: accounting-platform
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: contact_id
+                  type: uuid
+                  constraints:
+                    foreignKeyName: fk_user_contact
+                    references: contacts(id)

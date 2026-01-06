@@ -1,0 +1,100 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5-create-journal-entries-table
+      author: antigravity
+      changes:
+        - createTable:
+            tableName: journal_entries
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+              - column:
+                  name: entry_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: reference_number
+                  type: varchar(255)
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: journal_entries
+            indexName: idx_entry_date
+            columns:
+              - column:
+                  name: entry_date
+        - createTable:
+            tableName: journal_entry_lines
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: journal_entry_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: debit
+                  type: decimal(19, 4)
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: credit
+                  type: decimal(19, 4)
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: journal_entry_lines
+            baseColumnNames: journal_entry_id
+            referencedTableName: journal_entries
+            referencedColumnNames: id
+            constraintName: fk_lines_entry
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: journal_entry_lines
+            baseColumnNames: account_id
+            referencedTableName: accounts
+            referencedColumnNames: id
+            constraintName: fk_lines_account

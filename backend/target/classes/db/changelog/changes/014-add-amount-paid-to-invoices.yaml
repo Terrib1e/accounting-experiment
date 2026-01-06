@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 14-add-amount-paid-to-invoices
+      author: antigravity
+      changes:
+        - addColumn:
+            tableName: invoices
+            columns:
+              - column:
+                  name: amount_paid
+                  type: decimal(19, 4)
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
