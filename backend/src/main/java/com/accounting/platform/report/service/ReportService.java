@@ -7,9 +7,17 @@ import com.accounting.platform.journal.entity.JournalEntryStatus;
 import com.accounting.platform.journal.repository.JournalEntryRepository;
 import com.accounting.platform.report.dto.FinancialReportDto;
 import com.accounting.platform.report.dto.ReportLineDto;
+import com.accounting.platform.report.dto.AgingReportDto;
+import com.accounting.platform.invoice.entity.Invoice;
+import com.accounting.platform.invoice.entity.InvoiceStatus;
+import com.accounting.platform.invoice.repository.InvoiceRepository;
+import com.accounting.platform.expense.entity.Expense;
+import com.accounting.platform.expense.entity.ExpenseStatus;
+import com.accounting.platform.expense.repository.ExpenseRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,11 +27,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReportService {
 
     private final AccountRepository accountRepository;
     private final JournalEntryRepository journalEntryRepository;
     private final EntityManager entityManager;
+    private final InvoiceRepository invoiceRepository;
+    private final ExpenseRepository expenseRepository;
 
     public FinancialReportDto generateBalanceSheet(LocalDate asOfDate) {
         // 1. Fetch Balances for all ASSET, LIABILITY, EQUITY accounts
@@ -283,4 +294,127 @@ public class ReportService {
                 .map(ReportLineDto::getBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    // ==================== AGING REPORTS ====================
+
+    public AgingReportDto generateReceivablesAging(LocalDate asOfDate) {
+        // Get all unpaid invoices (SENT, APPROVED, PARTIALLY_PAID, OVERDUE)
+        List<Invoice> unpaidInvoices = invoiceRepository.findAll().stream()
+            .filter(i -> i.getStatus() != InvoiceStatus.PAID &&
+                         i.getStatus() != InvoiceStatus.VOID &&
+                         i.getStatus() != InvoiceStatus.DRAFT)
+            .filter(i -> !i.getDueDate().isAfter(asOfDate.plusDays(365))) // reasonable filter
+            .toList();
+
+        return buildAgingReport("RECEIVABLES", asOfDate, unpaidInvoices.stream()
+            .map(inv -> new AgingItem(
+                inv.getContact().getId().toString(),
+                inv.getContact().getName(),
+                inv.getInvoiceNumber(),
+                inv.getIssueDate(),
+                inv.getDueDate(),
+                inv.getTotalAmount().subtract(inv.getAmountPaid() != null ? inv.getAmountPaid() : BigDecimal.ZERO),
+                inv.getCurrency()
+            ))
+            .toList());
+    }
+
+    public AgingReportDto generatePayablesAging(LocalDate asOfDate) {
+        // Get all unpaid expenses (APPROVED, not PAID, not VOID)
+        List<Expense> unpaidExpenses = expenseRepository.findAll().stream()
+            .filter(e -> e.getStatus() == ExpenseStatus.APPROVED)
+            .filter(e -> e.getDueDate() == null || !e.getDueDate().isAfter(asOfDate.plusDays(365)))
+            .toList();
+
+        return buildAgingReport("PAYABLES", asOfDate, unpaidExpenses.stream()
+            .map(exp -> new AgingItem(
+                exp.getVendor().getId().toString(),
+                exp.getVendor().getName(),
+                exp.getReferenceNumber() != null ? exp.getReferenceNumber() : "EXP-" + exp.getId().toString().substring(0, 8),
+                exp.getDate(),
+                exp.getDueDate() != null ? exp.getDueDate() : exp.getDate().plusDays(30),
+                exp.getTotalAmount(),
+                exp.getCurrency()
+            ))
+            .toList());
+    }
+
+    private record AgingItem(
+        String contactId,
+        String contactName,
+        String documentNumber,
+        LocalDate documentDate,
+        LocalDate dueDate,
+        BigDecimal amount,
+        String currency
+    ) {}
+
+    private AgingReportDto buildAgingReport(String reportType, LocalDate asOfDate, List<AgingItem> items) {
+        // Define aging buckets
+        List<BucketDef> bucketDefs = List.of(
+            new BucketDef("Current", Integer.MIN_VALUE, 0),
+            new BucketDef("1-30 Days", 1, 30),
+            new BucketDef("31-60 Days", 31, 60),
+            new BucketDef("61-90 Days", 61, 90),
+            new BucketDef("90+ Days", 91, Integer.MAX_VALUE)
+        );
+
+        List<AgingReportDto.AgingBucketDto> buckets = new ArrayList<>();
+        BigDecimal totalOutstanding = BigDecimal.ZERO;
+        int totalCount = 0;
+
+        for (BucketDef def : bucketDefs) {
+            List<AgingReportDto.AgingLineDto> details = new ArrayList<>();
+            BigDecimal bucketAmount = BigDecimal.ZERO;
+
+            for (AgingItem item : items) {
+                long daysOverdue = java.time.temporal.ChronoUnit.DAYS.between(item.dueDate(), asOfDate);
+
+                boolean inBucket;
+                if (def.start() == Integer.MIN_VALUE) {
+                    inBucket = daysOverdue <= def.end();
+                } else if (def.end() == Integer.MAX_VALUE) {
+                    inBucket = daysOverdue >= def.start();
+                } else {
+                    inBucket = daysOverdue >= def.start() && daysOverdue <= def.end();
+                }
+
+                if (inBucket) {
+                    details.add(new AgingReportDto.AgingLineDto(
+                        item.contactId(),
+                        item.contactName(),
+                        item.documentNumber(),
+                        item.documentDate(),
+                        item.dueDate(),
+                        (int) daysOverdue,
+                        item.amount(),
+                        item.currency()
+                    ));
+                    bucketAmount = bucketAmount.add(item.amount());
+                }
+            }
+
+            buckets.add(new AgingReportDto.AgingBucketDto(
+                def.label(),
+                def.start() == Integer.MIN_VALUE ? 0 : def.start(),
+                def.end() == Integer.MAX_VALUE ? 999 : def.end(),
+                bucketAmount,
+                details.size(),
+                details
+            ));
+
+            totalOutstanding = totalOutstanding.add(bucketAmount);
+            totalCount += details.size();
+        }
+
+        return new AgingReportDto(
+            reportType,
+            asOfDate,
+            buckets,
+            totalOutstanding,
+            totalCount
+        );
+    }
+
+    private record BucketDef(String label, int start, int end) {}
 }

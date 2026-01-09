@@ -1,7 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Invoice } from '../models/invoice.model';
+
+export interface InvoiceFilters {
+  search?: string;
+  status?: string[];
+  contactId?: string;
+  startDate?: string;
+  endDate?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +19,20 @@ export class InvoiceService {
 
   constructor(private http: HttpClient) {}
 
-  getInvoices(): Observable<{data: { content: Invoice[] }}> {
-    return this.http.get<{data: { content: Invoice[] }}>(this.apiUrl);
+  getInvoices(filters?: InvoiceFilters): Observable<{data: { content: Invoice[] }}> {
+    let params = new HttpParams();
+
+    if (filters) {
+      if (filters.search) params = params.set('search', filters.search);
+      if (filters.status?.length) {
+        filters.status.forEach(s => params = params.append('status', s));
+      }
+      if (filters.contactId) params = params.set('contactId', filters.contactId);
+      if (filters.startDate) params = params.set('startDate', filters.startDate);
+      if (filters.endDate) params = params.set('endDate', filters.endDate);
+    }
+
+    return this.http.get<{data: { content: Invoice[] }}>(this.apiUrl, { params });
   }
 
   getInvoice(id: string): Observable<{data: Invoice}> {

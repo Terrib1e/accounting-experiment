@@ -11,5 +11,38 @@
 </head>
 <body>
   <app-root></app-root>
+
+  <!-- CRITICAL FIX: Override CDK's inline z-index for overlays inside dialogs -->
+  <script>
+    (function() {
+      // Watch for CDK overlay bounding boxes and force their z-index above dialogs
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          mutation.addedNodes.forEach(function(node) {
+            if (node.nodeType === 1) { // Element node
+              // Check if this is a bounding box
+              if (node.classList && node.classList.contains('cdk-overlay-connected-position-bounding-box')) {
+                node.style.setProperty('z-index', '10001', 'important');
+              }
+              // Also check children
+              var boxes = node.querySelectorAll ? node.querySelectorAll('.cdk-overlay-connected-position-bounding-box') : [];
+              boxes.forEach(function(box) {
+                box.style.setProperty('z-index', '10001', 'important');
+              });
+            }
+          });
+        });
+      });
+
+      // Start observing when DOM is ready
+      if (document.body) {
+        observer.observe(document.body, { childList: true, subtree: true });
+      } else {
+        document.addEventListener('DOMContentLoaded', function() {
+          observer.observe(document.body, { childList: true, subtree: true });
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

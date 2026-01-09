@@ -7,6 +7,10 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   if (authService.isAuthenticated()) {
+    const role = authService.getUserRole();
+    if (role === 'CLIENT') {
+      return router.createUrlTree(['/portal']);
+    }
     return true;
   }
 

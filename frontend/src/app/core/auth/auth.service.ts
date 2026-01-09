@@ -1,29 +1,30 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap, Observable } from 'rxjs';
+
+export interface User {
+  name: string;
+  email: string;
+  role: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private apiUrl = '/api/v1/auth';
-  currentUser = signal<any>(null); // Type this properly later
+  currentUser = signal<User | null>(this.decodeToken());
 
   constructor(private http: HttpClient, private router: Router) {}
 
   login(credentials: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
-        console.log('Full Login Response:', response);
         const token = response.data?.accessToken || response.accessToken || response.data?.access_token || response.access_token;
-        console.log('Extracted Token:', token);
-
         if (token) {
              localStorage.setItem('token', token);
-             this.currentUser.set({ name: 'User' });
-        } else {
-            console.error('Token not found in response');
+             this.currentUser.set(this.decodeToken());
         }
       })
     );
@@ -32,11 +33,10 @@ export class AuthService {
   register(userData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/register`, userData).pipe(
         tap(response => {
-            console.log('Register Response:', response);
              const token = response.data?.accessToken || response.accessToken || response.data?.access_token || response.access_token;
             if (token) {
                 localStorage.setItem('token', token);
-                this.currentUser.set({ name: 'User' });
+                this.currentUser.set(this.decodeToken());
             }
         })
     );
@@ -56,18 +56,28 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  getUserRole(): string | null {
+  private decodeToken(): User | null {
     const token = this.getToken();
     if (!token) return null;
 
     try {
-      // Decode JWT payload (base64)
       const payload = JSON.parse(atob(token.split('.')[1]));
-      // Spring Security typically uses 'role' or 'authorities' claim
-      return payload.role || payload.authorities?.[0]?.replace('ROLE_', '') || null;
+      const role = (payload.role || payload.authorities?.[0] || 'USER').replace('ROLE_', '');
+      const email = payload.sub || payload.email;
+      const name = email ? email.split('@')[0] : 'User';
+
+      return {
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        email: email,
+        role: role
+      };
     } catch (e) {
       console.error('Failed to decode token', e);
       return null;
     }
+  }
+
+  getUserRole(): string | null {
+    return this.currentUser()?.role || null;
   }
 }

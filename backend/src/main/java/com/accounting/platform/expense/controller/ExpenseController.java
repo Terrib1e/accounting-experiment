@@ -20,8 +20,15 @@ public class ExpenseController {
     private final ExpenseService expenseService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<Expense>>> getAllExpenses(Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(expenseService.getAllExpenses(pageable)));
+    public ResponseEntity<ApiResponse<Page<Expense>>> getAllExpenses(
+            Pageable pageable,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) java.util.List<com.accounting.platform.expense.entity.ExpenseStatus> status,
+            @RequestParam(required = false) UUID vendorId,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate) {
+        return ResponseEntity.ok(ApiResponse.success(
+            expenseService.getAllExpenses(pageable, search, status, vendorId, startDate, endDate)));
     }
 
     @GetMapping("/{id}")

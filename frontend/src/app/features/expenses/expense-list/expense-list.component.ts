@@ -1,8 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ExpenseService } from '../../../core/services/expense.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+import { ExpenseService, ExpenseFilters } from '../../../core/services/expense.service';
+import { ContactService } from '../../../core/services/contact.service';
 import { Expense } from '../../../core/models/expense.model';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { TableFilterComponent, FilterConfig, FilterState } from '../../../shared/components/table-filter/table-filter.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ExpenseFormComponent } from '../expense-form/expense-form.component';
 import { PaymentDialogComponent } from '../../../shared/components/payment-dialog/payment-dialog.component';
@@ -12,7 +16,14 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-expense-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, MatDialogModule, MatMenuModule, MatIconModule],
+  imports: [
+    CommonModule,
+    ButtonComponent,
+    TableFilterComponent,
+    MatDialogModule,
+    MatMenuModule,
+    MatIconModule
+  ],
   template: `
     <div class="space-y-6 animate-in">
       <!-- Header -->
@@ -22,6 +33,18 @@ import { MatIconModule } from '@angular/material/icon';
            <p class="text-slate-500 mt-1">Track company expenses and bills.</p>
         </div>
         <app-button icon="add" (onClick)="openCreateModal()">New Expense</app-button>
+      </div>
+
+      <!-- Filters -->
+      <app-table-filter
+        [config]="filterConfig"
+        [initialFilters]="initialFilters"
+        (filterChange)="onFilterChange($event)">
+      </app-table-filter>
+
+      <!-- Results Summary -->
+      <div class="flex items-center justify-between text-sm text-slate-500">
+        <span>{{ expenses.length }} expense{{ expenses.length === 1 ? '' : 's' }} found</span>
       </div>
 
       <!-- Table Container -->
@@ -103,7 +126,7 @@ import { MatIconModule } from '@angular/material/icon';
                       <span class="material-icons text-3xl text-slate-400">receipt_long</span>
                     </div>
                     <p class="text-slate-500 font-medium">No expenses found</p>
-                    <p class="text-slate-400 text-sm mt-1">Record your first expense to get started</p>
+                    <p class="text-slate-400 text-sm mt-1">{{ hasActiveFilters ? 'Try adjusting your filters' : 'Record your first expense to get started' }}</p>
                   </div>
                </td>
             </tr>
@@ -113,20 +136,118 @@ import { MatIconModule } from '@angular/material/icon';
     </div>
   `,
 })
-export class ExpenseListComponent implements OnInit {
+export class ExpenseListComponent implements OnInit, OnDestroy {
   expenses: Expense[] = [];
+  vendors: { id: string; name: string }[] = [];
+  currentFilters: ExpenseFilters = {};
+  hasActiveFilters = false;
+
+  private destroy$ = new Subject<void>();
+
+  filterConfig: FilterConfig = {
+    showSearch: true,
+    showStatus: true,
+    showDateRange: true,
+    showContact: true,
+    placeholder: 'Search expenses, references...',
+    statusOptions: [
+      { value: 'DRAFT', label: 'Draft' },
+      { value: 'APPROVED', label: 'Approved' },
+      { value: 'PAID', label: 'Paid' },
+      { value: 'VOID', label: 'Void' }
+    ],
+    contacts: []
+  };
+
+  initialFilters: Partial<FilterState> = {};
 
   constructor(
     private expenseService: ExpenseService,
-    private dialog: MatDialog
+    private contactService: ContactService,
+    private dialog: MatDialog,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    // Load vendors for filter dropdown
+    this.loadVendors();
+
+    // Parse URL query params for initial filters
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      this.initialFilters = {
+        search: params['search'] || '',
+        status: params['status'] ? (Array.isArray(params['status']) ? params['status'] : [params['status']]) : [],
+        startDate: params['startDate'] || null,
+        endDate: params['endDate'] || null,
+        contactId: params['vendorId'] || null
+      };
+
+      this.currentFilters = {
+        search: this.initialFilters.search,
+        status: this.initialFilters.status,
+        startDate: this.initialFilters.startDate || undefined,
+        endDate: this.initialFilters.endDate || undefined,
+        vendorId: this.initialFilters.contactId || undefined
+      };
+
+      this.loadExpenses();
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadVendors() {
+    this.contactService.getContacts().subscribe({
+      next: (res: { data: { content: any[] } }) => {
+        // Filter to show only vendors
+        this.vendors = res.data.content
+          .filter(c => c.type === 'VENDOR' || c.type === 'BOTH')
+          .map(c => ({ id: c.id, name: c.name }));
+        this.filterConfig = { ...this.filterConfig, contacts: this.vendors };
+      },
+      error: (err: any) => console.error('Error loading vendors:', err)
+    });
+  }
+
+  onFilterChange(filters: FilterState) {
+    this.currentFilters = {
+      search: filters.search || undefined,
+      status: filters.status?.length ? filters.status : undefined,
+      startDate: filters.startDate || undefined,
+      endDate: filters.endDate || undefined,
+      vendorId: filters.contactId || undefined
+    };
+
+    this.hasActiveFilters = !!(
+      filters.search ||
+      filters.status?.length ||
+      filters.startDate ||
+      filters.endDate ||
+      filters.contactId
+    );
+
+    // Update URL with filters
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: filters.search || null,
+        status: filters.status?.length ? filters.status : null,
+        startDate: filters.startDate || null,
+        endDate: filters.endDate || null,
+        vendorId: filters.contactId || null
+      },
+      queryParamsHandling: 'merge'
+    });
+
     this.loadExpenses();
   }
 
   loadExpenses() {
-    this.expenseService.getExpenses().subscribe({
+    this.expenseService.getExpenses(this.currentFilters).subscribe({
         next: (res: {data: { content: Expense[] }}) => this.expenses = res.data.content,
         error: (err: any) => console.error(err)
     });
@@ -150,6 +271,7 @@ export class ExpenseListComponent implements OnInit {
        }
     });
   }
+
   approve(expense: Expense) {
       if (confirm('Are you sure you want to approve this expense? This will post to the General Ledger.')) {
           this.expenseService.approveExpense(expense.id).subscribe(() => this.loadExpenses());
@@ -158,7 +280,8 @@ export class ExpenseListComponent implements OnInit {
 
   pay(expense: Expense) {
       const dialogRef = this.dialog.open(PaymentDialogComponent, {
-          width: '400px'
+          width: '400px',
+          panelClass: 'premium-dialog'
       });
 
       dialogRef.afterClosed().subscribe(result => {

@@ -10,9 +10,11 @@ import com.accounting.platform.invoice.entity.Invoice;
 import com.accounting.platform.invoice.entity.InvoiceLine;
 import com.accounting.platform.invoice.entity.InvoiceStatus;
 import com.accounting.platform.invoice.repository.InvoiceRepository;
+import com.accounting.platform.invoice.repository.InvoiceSpecifications;
 import com.accounting.platform.journal.entity.JournalEntry;
 import com.accounting.platform.journal.entity.JournalEntryLine;
 import com.accounting.platform.journal.service.JournalEntryService;
+import com.accounting.platform.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,9 +37,22 @@ public class InvoiceService {
     private final com.accounting.platform.tax.repository.TaxRateRepository taxRateRepository;
     private final ContactRepository contactRepository;
     private final AuditService auditService;
+    private final NotificationService notificationService;
 
     public Page<Invoice> getAllInvoices(Pageable pageable) {
         return invoiceRepository.findAll(pageable);
+    }
+
+    public Page<Invoice> getAllInvoices(
+            Pageable pageable,
+            String search,
+            Collection<InvoiceStatus> statuses,
+            UUID contactId,
+            LocalDate startDate,
+            LocalDate endDate) {
+
+        var spec = InvoiceSpecifications.buildSpec(search, statuses, contactId, startDate, endDate);
+        return invoiceRepository.findAll(spec, pageable);
     }
 
     public Invoice getInvoiceById(UUID id) {
@@ -191,6 +208,7 @@ public class InvoiceService {
         }
 
         JournalEntry createdEntry = journalEntryService.createEntry(entry);
+        journalEntryService.approve(createdEntry.getId());
         journalEntryService.postEntry(createdEntry.getId());
 
         // 3. Update Invoice Status
@@ -198,6 +216,8 @@ public class InvoiceService {
         Invoice saved = invoiceRepository.save(invoice);
 
         auditService.logAction("APPROVE_INVOICE", "Invoice", id, "Created Journal Entry " + createdEntry.getReferenceNumber());
+
+        notificationService.notifyInvoiceApproved(invoice.getInvoiceNumber(), id);
 
         return saved;
     }
@@ -247,6 +267,7 @@ public class InvoiceService {
         entry.addLine(creditAR);
 
         JournalEntry createdEntry = journalEntryService.createEntry(entry);
+        journalEntryService.approve(createdEntry.getId());
         journalEntryService.postEntry(createdEntry.getId());
 
         // Update Invoice
@@ -254,6 +275,8 @@ public class InvoiceService {
         Invoice saved = invoiceRepository.save(invoice);
 
         auditService.logAction("PAY_INVOICE", "Invoice", id, "Registered Payment " + createdEntry.getReferenceNumber());
+
+        notificationService.notifyInvoicePaid(invoice.getInvoiceNumber(), id);
 
         return saved;
     }

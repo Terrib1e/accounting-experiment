@@ -3,20 +3,20 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.5</version>
         <relativePath/>
     </parent>
-    
+
     <groupId>com.accounting</groupId>
     <artifactId>accounting-platform</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <name>Enterprise Accounting Platform</name>
     <description>Enterprise-grade accounting platform for SMBs</description>
-    
+
     <properties>
         <java.version>21</java.version>
         <jqwik.version>1.8.4</jqwik.version>
@@ -26,7 +26,7 @@
         <bouncycastle.version>1.78.1</bouncycastle.version>
         <totp.version>1.7.1</totp.version>
     </properties>
-    
+
     <dependencies>
         <!-- Spring Boot Starters -->
         <dependency>
@@ -64,7 +64,7 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
         </dependency>
-        
+
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -83,35 +83,40 @@
             <version>0.12.5</version>
             <scope>runtime</scope>
         </dependency>
-        
+
         <!-- Password Hashing (Argon2) -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
         </dependency>
-        
+
         <!-- TOTP for MFA -->
         <dependency>
             <groupId>dev.samstevens.totp</groupId>
             <artifactId>totp</artifactId>
             <version>${totp.version}</version>
         </dependency>
-        
+
         <!-- JSON Type for PostgreSQL -->
         <dependency>
             <groupId>io.hypersistence</groupId>
             <artifactId>hypersistence-utils-hibernate-63</artifactId>
             <version>3.7.5</version>
         </dependency>
-        
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate6</artifactId>
+        </dependency>
+
         <!-- MapStruct -->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
         </dependency>
-        
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -119,14 +124,14 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- OpenAPI Documentation -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
-        
+
         <!-- PDF Generation -->
         <dependency>
             <groupId>com.itextpdf</groupId>
@@ -134,14 +139,14 @@
             <version>8.0.4</version>
             <type>pom</type>
         </dependency>
-        
+
         <!-- Excel Export -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>5.2.5</version>
         </dependency>
-        
+
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -175,7 +180,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>

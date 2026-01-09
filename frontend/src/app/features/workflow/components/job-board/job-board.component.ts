@@ -8,7 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { WorkflowService } from '../../../../core/services/workflow.service';
 import { JobService } from '../../../../core/services/job.service';
 import { Workflow, WorkflowStage } from '../../../../core/models/workflow.model';
@@ -27,7 +27,8 @@ import { JobFormComponent } from '../job-form/job-form.component';
     MatCardModule,
     MatChipsModule,
     MatDialogModule,
-    FormsModule
+    FormsModule,
+    RouterModule
   ],
   templateUrl: './job-board.component.html',
   styleUrls: ['./job-board.component.css']
@@ -103,28 +104,71 @@ export class JobBoardComponent implements OnInit {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
+      const previousContainerData = event.previousContainer.data;
+      const containerData = event.container.data;
+      const previousIndex = event.previousIndex;
+      const currentIndex = event.currentIndex;
+
       transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
+        previousContainerData,
+        containerData,
+        previousIndex,
+        currentIndex,
       );
 
-      const job = event.container.data[event.currentIndex];
+      const job = containerData[currentIndex];
       const newStageId = event.container.id;
+      const oldStageId = event.previousContainer.id;
 
-      this.updateJobStage(job.id, newStageId);
+      this.updateJobStage(job, newStageId, oldStageId, previousContainerData, containerData, previousIndex, currentIndex);
     }
   }
 
-  updateJobStage(jobId: string, stageId: string): void {
-    this.jobService.updateStage(jobId, stageId).subscribe({
+  revertMove(
+    previousContainerData: Job[],
+    containerData: Job[],
+    previousIndex: number,
+    currentIndex: number,
+    job: Job,
+    oldStageId: string
+  ): void {
+    transferArrayItem(
+      containerData,
+      previousContainerData,
+      currentIndex,
+      previousIndex,
+    );
+    job.currentStageId = oldStageId;
+  }
+
+  updateJobStage(
+    job: Job,
+    newStageId: string,
+    oldStageId: string,
+    previousContainerData: Job[],
+    containerData: Job[],
+    previousIndex: number,
+    currentIndex: number
+  ): void {
+    if (!job.id || !newStageId) {
+      console.error('Missing job ID or stage ID', { job, newStageId });
+      this.revertMove(previousContainerData, containerData, previousIndex, currentIndex, job, oldStageId);
+      return;
+    }
+
+    // Optimistic update
+    job.currentStageId = newStageId;
+
+    this.jobService.updateStage(job.id, newStageId).subscribe({
       next: (updatedJob) => {
-        console.log('Job stage updated', updatedJob);
+        console.log('Job stage updated successfully', updatedJob);
+        // Update the local object with any server-side changes
+        Object.assign(job, updatedJob);
       },
       error: (err) => {
         console.error('Failed to update stage', err);
-        // Revert UI change? For now, just logging.
+        this.revertMove(previousContainerData, containerData, previousIndex, currentIndex, job, oldStageId);
+        alert('Failed to update job status. Please try again.');
       }
     });
   }
@@ -135,7 +179,8 @@ export class JobBoardComponent implements OnInit {
 
   openCreateJobDialog(): void {
     const dialogRef = this.dialog.open(JobFormComponent, {
-      width: '500px',
+      width: '600px',
+      panelClass: 'premium-dialog',
       data: {}
     });
 

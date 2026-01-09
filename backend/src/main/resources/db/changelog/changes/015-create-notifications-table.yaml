@@ -1,0 +1,70 @@
+databaseChangeLog:
+  - changeSet:
+      id: 015-create-notifications-table
+      author: system
+      changes:
+        - createTable:
+            tableName: notifications
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message
+                  type: text
+              - column:
+                  name: type
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_read
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_type
+                  type: varchar(50)
+              - column:
+                  name: entity_id
+                  type: varchar(36)
+              - column:
+                  name: action_url
+                  type: varchar(500)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createIndex:
+            indexName: idx_notifications_is_read
+            tableName: notifications
+            columns:
+              - column:
+                  name: is_read
+        - createIndex:
+            indexName: idx_notifications_created_at
+            tableName: notifications
+            columns:
+              - column:
+                  name: created_at
+                  descending: true

@@ -24,8 +24,16 @@ public class WorkflowService {
 
     public WorkflowDto createWorkflow(WorkflowDto dto) {
         Workflow workflow = workflowMapper.toEntity(dto);
-        if (workflow.getStages() != null) {
+        if (workflow.getStages() != null && !workflow.getStages().isEmpty()) {
             workflow.getStages().forEach(stage -> stage.setWorkflow(workflow));
+
+            // Ensure at least one stage is marked as initial
+            boolean hasInitial = workflow.getStages().stream().anyMatch(WorkflowStage::isInitial);
+            if (!hasInitial) {
+                workflow.getStages().stream()
+                        .min((a, b) -> Integer.compare(a.getOrderIndex(), b.getOrderIndex()))
+                        .ifPresent(stage -> stage.setInitial(true));
+            }
         }
         return workflowMapper.toDto(workflowRepository.save(workflow));
     }
@@ -45,29 +53,51 @@ public class WorkflowService {
     }
 
     public WorkflowDto updateWorkflow(UUID id, WorkflowDto dto) {
-        Workflow existing = workflowRepository.findById(id)
+        Workflow existing = workflowRepository.findByIdWithStages(id)
                 .orElseThrow(() -> new EntityNotFoundException("Workflow not found"));
 
         existing.setName(dto.getName());
         existing.setDescription(dto.getDescription());
 
-        // Clear existing stages to trigger orphanRemoval
-        existing.getStages().clear();
+        // Build a map of existing stages by ID for efficient lookup
+        java.util.Map<UUID, WorkflowStage> existingStagesById = existing.getStages().stream()
+                .filter(s -> s.getId() != null)
+                .collect(Collectors.toMap(WorkflowStage::getId, s -> s));
 
-        // Map and add new stages
+        // Track which existing stage IDs are still present in the DTO
+        java.util.Set<UUID> updatedStageIds = new java.util.HashSet<>();
+
         if (dto.getStages() != null) {
-            List<WorkflowStage> newStages = dto.getStages().stream()
-                .map(stageDto -> {
-                    WorkflowStage stage = workflowMapper.toStageEntity(stageDto);
-                    // Ensure ID is handled if passed, though usually new stages might not have IDs or we treat them as fresh
-                    // For simplicity in this logic, we rely on the mapper.
-                    // Important: We must set the workflow parent manually as the mapper might not set the back-reference
-                    // when mapping a list of unrelated objects or if toEntity is simple.
-                    return stage;
-                })
-                .collect(Collectors.toList());
+            for (var stageDto : dto.getStages()) {
+                if (stageDto.getId() != null && existingStagesById.containsKey(stageDto.getId())) {
+                    // Update existing stage in-place
+                    WorkflowStage existingStage = existingStagesById.get(stageDto.getId());
+                    existingStage.setName(stageDto.getName());
+                    existingStage.setOrderIndex(stageDto.getOrderIndex());
+                    existingStage.setInitial(stageDto.isInitial());
+                    existingStage.setFinal(stageDto.isFinal());
+                    updatedStageIds.add(stageDto.getId());
+                } else {
+                    // Add new stage
+                    WorkflowStage newStage = workflowMapper.toStageEntity(stageDto);
+                    newStage.setId(null); // Ensure it's treated as new
+                    existing.addStage(newStage);
+                }
+            }
+        }
 
-            newStages.forEach(existing::addStage);
+        // Remove stages that are no longer in the DTO
+        existing.getStages().removeIf(stage ->
+                stage.getId() != null && !updatedStageIds.contains(stage.getId()));
+
+        // Ensure at least one stage is marked as initial
+        if (!existing.getStages().isEmpty()) {
+            boolean hasInitial = existing.getStages().stream().anyMatch(WorkflowStage::isInitial);
+            if (!hasInitial) {
+                existing.getStages().stream()
+                        .min((a, b) -> Integer.compare(a.getOrderIndex(), b.getOrderIndex()))
+                        .ifPresent(stage -> stage.setInitial(true));
+            }
         }
 
         return workflowMapper.toDto(workflowRepository.save(existing));

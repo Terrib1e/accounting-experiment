@@ -23,8 +23,15 @@ public class InvoiceController {
     private final PdfService pdfService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<Invoice>>> getAllInvoices(Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(invoiceService.getAllInvoices(pageable)));
+    public ResponseEntity<ApiResponse<Page<Invoice>>> getAllInvoices(
+            Pageable pageable,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) java.util.List<com.accounting.platform.invoice.entity.InvoiceStatus> status,
+            @RequestParam(required = false) UUID contactId,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate) {
+        return ResponseEntity.ok(ApiResponse.success(
+            invoiceService.getAllInvoices(pageable, search, status, contactId, startDate, endDate)));
     }
 
     @GetMapping("/{id}")

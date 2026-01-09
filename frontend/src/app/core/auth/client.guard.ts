@@ -1,28 +1,19 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from './auth.service';
 
-/**
- * Guard for client portal routes.
- * Allows access only if the user has the CLIENT role.
- */
-export const clientGuard: CanActivateFn = () => {
+export const clientGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // Check if user is authenticated
-  if (!authService.isAuthenticated()) {
-    router.navigate(['/auth/login']);
-    return false;
+  if (authService.isAuthenticated()) {
+    const role = authService.getUserRole();
+    if (role === 'CLIENT') {
+      return true;
+    }
+    // If not a client, redirect to staff dashboard
+    return router.createUrlTree(['/dashboard']);
   }
 
-  // Check for CLIENT role
-  const userRole = authService.getUserRole();
-  if (userRole === 'CLIENT') {
-    return true;
-  }
-
-  // Non-client users trying to access portal -> redirect to main dashboard
-  router.navigate(['/dashboard']);
-  return false;
+  return router.createUrlTree(['/auth/login']);
 };

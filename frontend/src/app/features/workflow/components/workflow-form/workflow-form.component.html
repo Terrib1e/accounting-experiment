@@ -1,59 +1,107 @@
-<h2 mat-dialog-title>{{ isEditing ? 'Edit Workflow' : 'Create Workflow' }}</h2>
-
-<mat-dialog-content>
-  <form [formGroup]="form" id="workflow-form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 min-w-[500px] py-2">
-
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Workflow Name</mat-label>
-      <input matInput formControlName="name" placeholder="e.g., 1040 Tax Return">
-      <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description" rows="2" placeholder="Optional description"></textarea>
-    </mat-form-field>
-
-    <!-- Stages Section -->
-    <div class="mt-4">
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 m-0">Stages</h3>
-        <button mat-stroked-button type="button" (click)="addStage()" class="!rounded-lg !px-3 !py-0 !h-8 text-xs">
-          <mat-icon class="!w-4 !h-4 !text-[16px] leading-[16px] mr-1">add</mat-icon> Add Stage
-        </button>
+<div class="premium-dialog flex flex-col h-full bg-white text-slate-900">
+  <!-- Header -->
+  <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 z-50 bg-white">
+    <div class="flex items-center gap-4">
+      <div class="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center border border-primary-100/30">
+        <mat-icon class="text-primary-600 scale-90">account_tree</mat-icon>
       </div>
-
-      <div cdkDropList (cdkDropListDropped)="dropStage($event)" class="flex flex-col gap-2">
-        <div *ngFor="let stageCtrl of stages.controls; let i = index"
-             [formGroup]="$any(stageCtrl)"
-             cdkDrag
-             class="group flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-300 transition-colors">
-
-          <mat-icon cdkDragHandle class="cursor-move text-slate-400 group-hover:text-slate-600">drag_indicator</mat-icon>
-
-          <mat-form-field appearance="outline" class="flex-1 !mb-[-1.25em]"> <!-- Negative margin to tighten dense form fields -->
-            <mat-label>Stage Name</mat-label>
-            <input matInput formControlName="name" placeholder="e.g., Data Collection">
-          </mat-form-field>
-
-          <div class="flex items-center gap-2 px-2">
-            <mat-checkbox formControlName="isInitial" class="text-sm text-slate-600">Initial</mat-checkbox>
-            <mat-checkbox formControlName="isFinal" class="text-sm text-slate-600">Final</mat-checkbox>
-          </div>
-
-          <button mat-icon-button color="warn" type="button" (click)="removeStage(i)" [disabled]="stages.length <= 1" class="!w-8 !h-8 flex items-center justify-center">
-            <mat-icon class="!text-[20px]">delete</mat-icon>
-            </button>
-        </div>
+      <div class="flex flex-col">
+        <h2 class="text-slate-900 text-lg font-bold tracking-tight leading-none m-0">{{ isEditing ? 'Edit' : 'Create' }} Workflow</h2>
+        <span class="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest flex items-center gap-1.5 leading-none">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary-500"></span> Process Design
+        </span>
       </div>
     </div>
+    <button mat-icon-button (click)="onCancel()" class="hover:bg-slate-50 transition-all rounded-xl text-slate-400">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-  </form>
-</mat-dialog-content>
+  <mat-dialog-content class="!p-0 !m-0 bg-slate-50/30">
+    <form [formGroup]="form" id="workflow-form" (ngSubmit)="onSubmit()" class="flex flex-col gap-10 p-8 min-w-[550px]">
 
-<mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || isLoading">
-    {{ isLoading ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
-  </button>
-</mat-dialog-actions>
+      <!-- Core Info Section -->
+      <div class="flex flex-col gap-1">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest leading-none px-1">Definition</h3>
+        <div class="p-6 bg-white rounded-3xl border border-slate-200/60 shadow-sm flex flex-col gap-6 mt-3">
+          <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-label>Workflow Name</mat-label>
+            <input matInput formControlName="name" placeholder="e.g., 1040 Tax Return Preparation" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-label>Workflow Description</mat-label>
+            <textarea matInput formControlName="description" rows="2" placeholder="Explain the purpose of this workflow..."></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Stages Section -->
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">Process Stages</h3>
+          <button mat-stroked-button type="button" (click)="addStage()" class="!rounded-xl !border-slate-200 !text-slate-600 hover:!bg-slate-50 !font-bold !text-[11px] !py-1 h-8">
+            <mat-icon class="!text-sm !w-4 !h-4 !min-w-[16px] !min-h-[16px] !m-0">add</mat-icon>
+            <span class="ml-1 uppercase">Add Stage</span>
+          </button>
+        </div>
+
+        <div cdkDropList (cdkDropListDropped)="dropStage($event)" class="flex flex-col gap-3 mt-3">
+          <div *ngFor="let stageCtrl of stages.controls; let i = index"
+               [formGroup]="$any(stageCtrl)"
+               cdkDrag
+               class="group flex items-center gap-4 p-4 bg-white border border-slate-200/60 rounded-3xl hover:border-primary-200 hover:shadow-xl hover:shadow-primary-500/5 transition-all">
+
+            <div cdkDragHandle class="cursor-grab active:cursor-grabbing p-2 hover:bg-slate-50 rounded-xl transition-colors">
+              <mat-icon class="text-slate-300 group-hover:text-slate-400">drag_indicator</mat-icon>
+            </div>
+
+            <div class="flex-1">
+              <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                <input matInput formControlName="name" placeholder="Stage name (e.g., Review)">
+              </mat-form-field>
+            </div>
+
+            <div class="flex items-center gap-3 bg-slate-50/80 px-4 py-2 rounded-2xl border border-slate-100">
+              <mat-checkbox formControlName="isInitial" class="custom-checkbox">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500">START</span>
+              </mat-checkbox>
+              <div class="w-[1px] h-4 bg-slate-200 mx-1"></div>
+              <mat-checkbox formControlName="isFinal" class="custom-checkbox">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500">END</span>
+              </mat-checkbox>
+            </div>
+
+            <button mat-icon-button type="button" (click)="removeStage(i)" [disabled]="stages.length <= 1"
+                    class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all flex items-center justify-center">
+              <mat-icon class="!text-lg">delete_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="!px-8 !py-6 bg-white border-t border-slate-100">
+    <button mat-button (click)="onCancel()" class="!rounded-xl !px-6 h-12 !text-slate-500 hover:bg-slate-50 font-bold transition-all">Cancel</button>
+    <button mat-flat-button color="primary"
+            (click)="onSubmit()"
+            [disabled]="form.invalid || isLoading"
+            class="!min-w-[200px] !bg-primary-600 !text-white !rounded-xl !h-12 shadow-xl shadow-primary-500/10 hover:shadow-xl transition-all font-bold">
+      <div class="flex items-center justify-center gap-2">
+        <mat-icon *ngIf="!isLoading" class="!text-lg">{{ isEditing ? 'save' : 'add_task' }}</mat-icon>
+        <mat-spinner diameter="20" *ngIf="isLoading" strokeWidth="3" class="!text-white"></mat-spinner>
+        <span class="tracking-tight">{{ isLoading ? 'Saving...' : (isEditing ? 'Update Workflow' : 'Create Workflow') }}</span>
+      </div>
+    </button>
+  </mat-dialog-actions>
+</div>
+
+<style>
+  ::ng-deep .custom-checkbox .mdc-label {
+    padding-left: 8px !important;
+  }
+  ::ng-deep .premium-dialog .mat-mdc-dialog-content {
+      overflow-x: hidden !important;
+  }
+</style>

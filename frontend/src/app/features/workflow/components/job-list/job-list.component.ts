@@ -48,7 +48,8 @@ export class JobListComponent implements OnInit {
 
   openCreateJobDialog(): void {
     const dialogRef = this.dialog.open(JobFormComponent, {
-      width: '500px',
+      width: '600px',
+      panelClass: 'premium-dialog',
       data: {}
     });
 
@@ -61,7 +62,8 @@ export class JobListComponent implements OnInit {
 
   openEditJobDialog(job: Job): void {
     const dialogRef = this.dialog.open(JobFormComponent, {
-      width: '500px',
+      width: '600px',
+      panelClass: 'premium-dialog',
       data: { job }
     });
 

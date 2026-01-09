@@ -136,7 +136,7 @@ import { Observable } from 'rxjs';
           <div class="flex items-center justify-between px-1">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Transaction Timeline</h3>
             <button routerLink="/journals" class="text-[10px] font-bold uppercase tracking-widest text-primary-600 hover:text-primary-700 transition-colors flex items-center hover:underline">
-               View All History <span class="material-icons text-[10px] ml-1">arrow_forward</span>
+               View General Ledger <span class="material-icons text-[10px] ml-1">arrow_forward</span>
             </button>
           </div>
 

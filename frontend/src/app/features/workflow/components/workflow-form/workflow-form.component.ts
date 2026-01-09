@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import { WorkflowService } from '../../../../core/services/workflow.service';
 import { Workflow, WorkflowStage } from '../../../../core/models/workflow.model';
@@ -27,6 +28,7 @@ export interface WorkflowFormDialogData {
     MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
+    MatProgressSpinnerModule,
     DragDropModule
   ],
   templateUrl: './workflow-form.component.html',

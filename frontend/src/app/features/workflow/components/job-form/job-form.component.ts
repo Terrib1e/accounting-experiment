@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatNativeDateModule } from '@angular/material/core';
 import { WorkflowService } from '../../../../core/services/workflow.service';
 import { ContactService } from '../../../../core/services/contact.service';
@@ -33,7 +34,8 @@ export interface JobFormDialogData {
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './job-form.component.html',
   styleUrls: ['./job-form.component.css']
@@ -51,7 +53,8 @@ export class JobFormComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: JobFormDialogData,
     private workflowService: WorkflowService,
     private contactService: ContactService,
-    private jobService: JobService
+    private jobService: JobService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -71,8 +74,32 @@ export class JobFormComponent implements OnInit {
   }
 
   loadData(): void {
-    this.workflowService.getAllWorkflows().subscribe(wfs => this.workflows = wfs);
-    this.contactService.getContacts().subscribe(response => this.contacts = response.data.content);
+    this.workflowService.getAllWorkflows().subscribe({
+      next: (wfs) => {
+        console.log('JobForm: Workflows loaded:', wfs);
+        this.workflows = wfs;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('JobForm: Error loading workflows:', err);
+      }
+    });
+    this.contactService.getContacts().subscribe({
+      next: (response) => {
+        console.log('JobForm: Contacts response:', response);
+        if (response && response.data && response.data.content) {
+          this.contacts = response.data.content;
+          console.log('JobForm: Contacts loaded:', this.contacts);
+          this.cdr.detectChanges();
+        } else {
+          console.warn('JobForm: Unexpected contacts response structure:', response);
+          this.contacts = [];
+        }
+      },
+      error: (err) => {
+        console.error('JobForm: Error loading contacts:', err);
+      }
+    });
   }
 
   onSubmit(): void {
@@ -90,8 +117,16 @@ export class JobFormComponent implements OnInit {
     };
 
     if (this.isEditing && this.data.job) {
-      // Update not implemented yet, just close
-      this.dialogRef.close(null);
+      this.jobService.updateJob(this.data.job.id, jobPayload).subscribe({
+        next: (updated) => {
+          this.isLoading = false;
+          this.dialogRef.close(updated);
+        },
+        error: (err) => {
+          console.error('Failed to update job', err);
+          this.isLoading = false;
+        }
+      });
     } else {
       this.jobService.createJob(jobPayload).subscribe({
         next: (created) => {

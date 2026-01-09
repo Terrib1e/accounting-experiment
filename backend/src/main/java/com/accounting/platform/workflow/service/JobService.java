@@ -9,6 +9,7 @@ import com.accounting.platform.workflow.entity.WorkflowStage;
 import com.accounting.platform.workflow.mapper.JobMapper;
 import com.accounting.platform.workflow.repository.JobRepository;
 import com.accounting.platform.workflow.repository.WorkflowRepository;
+import com.accounting.platform.notification.service.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,12 +28,13 @@ public class JobService {
     private final WorkflowRepository workflowRepository;
     private final ContactRepository contactRepository;
     private final JobMapper jobMapper;
+    private final NotificationService notificationService;
 
     public JobDto createJob(JobDto dto) {
         Job job = jobMapper.toEntity(dto);
 
-        // Link Workflow
-        Workflow workflow = workflowRepository.findById(dto.getWorkflowId())
+        // Link Workflow (with eager fetch of stages)
+        Workflow workflow = workflowRepository.findByIdWithStages(dto.getWorkflowId())
                 .orElseThrow(() -> new EntityNotFoundException("Workflow not found"));
         job.setWorkflow(workflow);
 
@@ -41,14 +43,20 @@ public class JobService {
                 .orElseThrow(() -> new EntityNotFoundException("Contact not found"));
         job.setContact(contact);
 
-        // Set Initial Stage
+        // Set Initial Stage (fallback to first stage by orderIndex if none marked as initial)
         WorkflowStage initialStage = workflow.getStages().stream()
                 .filter(WorkflowStage::isInitial)
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Workflow has no initial stage"));
+                .orElseGet(() -> workflow.getStages().stream()
+                        .min((a, b) -> Integer.compare(a.getOrderIndex(), b.getOrderIndex()))
+                        .orElseThrow(() -> new IllegalStateException("Workflow has no stages")));
         job.setCurrentStage(initialStage);
 
-        return jobMapper.toDto(jobRepository.save(job));
+        Job savedJob = jobRepository.save(job);
+
+        notificationService.notifyJobCreated(contact.getName(), savedJob.getId());
+
+        return jobMapper.toDto(savedJob);
     }
 
     public JobDto updateStage(UUID jobId, UUID stageId) {
@@ -62,6 +70,42 @@ public class JobService {
                 .orElseThrow(() -> new IllegalArgumentException("Stage does not belong to this workflow"));
 
         job.setCurrentStage(newStage);
+        return jobMapper.toDto(jobRepository.save(job));
+    }
+
+    public JobDto updateJob(UUID jobId, JobDto dto) {
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new EntityNotFoundException("Job not found"));
+
+        // Update basic fields
+        job.setName(dto.getName());
+        job.setDueDate(dto.getDueDate());
+        job.setAssigneeId(dto.getAssigneeId());
+
+        // Update workflow if changed
+        if (dto.getWorkflowId() != null && !dto.getWorkflowId().equals(job.getWorkflow().getId())) {
+            Workflow workflow = workflowRepository.findByIdWithStages(dto.getWorkflowId())
+                    .orElseThrow(() -> new EntityNotFoundException("Workflow not found"));
+            job.setWorkflow(workflow);
+            // Set to initial stage of new workflow, or first stage by order if none marked as initial
+            WorkflowStage newStage = workflow.getStages().stream()
+                    .filter(WorkflowStage::isInitial)
+                    .findFirst()
+                    .orElseGet(() -> workflow.getStages().stream()
+                            .min((a, b) -> Integer.compare(a.getOrderIndex(), b.getOrderIndex()))
+                            .orElse(null));
+            if (newStage != null) {
+                job.setCurrentStage(newStage);
+            }
+        }
+
+        // Update contact if changed
+        if (dto.getContactId() != null && !dto.getContactId().equals(job.getContact().getId())) {
+            Contact contact = contactRepository.findById(dto.getContactId())
+                    .orElseThrow(() -> new EntityNotFoundException("Contact not found"));
+            job.setContact(contact);
+        }
+
         return jobMapper.toDto(jobRepository.save(job));
     }
 

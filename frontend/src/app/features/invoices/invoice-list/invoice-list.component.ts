@@ -1,8 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { InvoiceService } from '../../../core/services/invoice.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+import { InvoiceService, InvoiceFilters } from '../../../core/services/invoice.service';
+import { ContactService } from '../../../core/services/contact.service';
 import { Invoice } from '../../../core/models/invoice.model';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { TableFilterComponent, FilterConfig, FilterState } from '../../../shared/components/table-filter/table-filter.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PaymentDialogComponent } from '../../../shared/components/payment-dialog/payment-dialog.component';
 import { MatMenuModule } from '@angular/material/menu';
@@ -15,6 +19,7 @@ import { InvoiceFormComponent } from '../invoice-form/invoice-form.component';
   imports: [
     CommonModule,
     ButtonComponent,
+    TableFilterComponent,
     MatDialogModule,
     MatMenuModule,
     MatIconModule,
@@ -28,6 +33,18 @@ import { InvoiceFormComponent } from '../invoice-form/invoice-form.component';
           <p class="text-slate-500 mt-1">Manage customer invoices and payments.</p>
         </div>
         <app-button icon="add" (onClick)="openCreateModal()">New Invoice</app-button>
+      </div>
+
+      <!-- Filters -->
+      <app-table-filter
+        [config]="filterConfig"
+        [initialFilters]="initialFilters"
+        (filterChange)="onFilterChange($event)">
+      </app-table-filter>
+
+      <!-- Results Summary -->
+      <div class="flex items-center justify-between text-sm text-slate-500">
+        <span>{{ invoices.length }} invoice{{ invoices.length === 1 ? '' : 's' }} found</span>
       </div>
 
       <!-- Table Container -->
@@ -86,13 +103,13 @@ import { InvoiceFormComponent } from '../invoice-form/invoice-form.component';
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                 <span [ngClass]="{
                     'bg-accent-100 text-accent-700': invoice.status === 'PAID',
-                    'bg-primary-100 text-primary-700': invoice.status === 'APPROVED',
+                    'bg-primary-100 text-primary-700': invoice.status === 'APPROVED' || invoice.status === 'SENT',
                     'bg-slate-100 text-slate-600': invoice.status === 'DRAFT',
                     'bg-red-100 text-red-700': invoice.status === 'VOID'
                   }"
                   class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold">
                   <span class="material-icons text-xs mr-1" *ngIf="invoice.status === 'PAID'">check_circle</span>
-                  <span class="material-icons text-xs mr-1" *ngIf="invoice.status === 'APPROVED'">verified</span>
+                  <span class="material-icons text-xs mr-1" *ngIf="invoice.status === 'APPROVED' || invoice.status === 'SENT'">verified</span>
                   <span class="material-icons text-xs mr-1" *ngIf="invoice.status === 'DRAFT'">edit_note</span>
                   <span class="material-icons text-xs mr-1" *ngIf="invoice.status === 'VOID'">cancel</span>
                   {{ invoice.status }}
@@ -104,7 +121,7 @@ import { InvoiceFormComponent } from '../invoice-form/invoice-form.component';
                         class="px-3 py-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all font-semibold">
                   Approve
                 </button>
-                <button *ngIf="invoice.status === 'APPROVED'"
+                <button *ngIf="invoice.status === 'APPROVED' || invoice.status === 'SENT'"
                         (click)="pay(invoice)"
                         class="px-3 py-1 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-all font-semibold">
                   Pay
@@ -138,7 +155,7 @@ import { InvoiceFormComponent } from '../invoice-form/invoice-form.component';
                     <span class="material-icons text-3xl text-slate-400">description</span>
                   </div>
                   <p class="text-slate-500 font-medium">No invoices found</p>
-                  <p class="text-slate-400 text-sm mt-1">Create your first invoice to get started</p>
+                  <p class="text-slate-400 text-sm mt-1">{{ hasActiveFilters ? 'Try adjusting your filters' : 'Create your first invoice to get started' }}</p>
                 </div>
               </td>
             </tr>
@@ -148,20 +165,116 @@ import { InvoiceFormComponent } from '../invoice-form/invoice-form.component';
     </div>
   `,
 })
-export class InvoiceListComponent implements OnInit {
+export class InvoiceListComponent implements OnInit, OnDestroy {
   invoices: Invoice[] = [];
+  contacts: { id: string; name: string }[] = [];
+  currentFilters: InvoiceFilters = {};
+  hasActiveFilters = false;
+
+  private destroy$ = new Subject<void>();
+
+  filterConfig: FilterConfig = {
+    showSearch: true,
+    showStatus: true,
+    showDateRange: true,
+    showContact: true,
+    placeholder: 'Search invoices, references...',
+    statusOptions: [
+      { value: 'DRAFT', label: 'Draft' },
+      { value: 'SENT', label: 'Sent' },
+      { value: 'APPROVED', label: 'Approved' },
+      { value: 'PAID', label: 'Paid' },
+      { value: 'VOID', label: 'Void' }
+    ],
+    contacts: []
+  };
+
+  initialFilters: Partial<FilterState> = {};
 
   constructor(
     private invoiceService: InvoiceService,
-    private dialog: MatDialog
+    private contactService: ContactService,
+    private dialog: MatDialog,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    // Load contacts for filter dropdown
+    this.loadContacts();
+
+    // Parse URL query params for initial filters
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      this.initialFilters = {
+        search: params['search'] || '',
+        status: params['status'] ? (Array.isArray(params['status']) ? params['status'] : [params['status']]) : [],
+        startDate: params['startDate'] || null,
+        endDate: params['endDate'] || null,
+        contactId: params['contactId'] || null
+      };
+
+      this.currentFilters = {
+        search: this.initialFilters.search,
+        status: this.initialFilters.status,
+        startDate: this.initialFilters.startDate || undefined,
+        endDate: this.initialFilters.endDate || undefined,
+        contactId: this.initialFilters.contactId || undefined
+      };
+
+      this.loadInvoices();
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadContacts() {
+    this.contactService.getContacts().subscribe({
+      next: (res: { data: { content: any[] } }) => {
+        this.contacts = res.data.content.map(c => ({ id: c.id, name: c.name }));
+        this.filterConfig = { ...this.filterConfig, contacts: this.contacts };
+      },
+      error: (err: any) => console.error('Error loading contacts:', err)
+    });
+  }
+
+  onFilterChange(filters: FilterState) {
+    this.currentFilters = {
+      search: filters.search || undefined,
+      status: filters.status?.length ? filters.status : undefined,
+      startDate: filters.startDate || undefined,
+      endDate: filters.endDate || undefined,
+      contactId: filters.contactId || undefined
+    };
+
+    this.hasActiveFilters = !!(
+      filters.search ||
+      filters.status?.length ||
+      filters.startDate ||
+      filters.endDate ||
+      filters.contactId
+    );
+
+    // Update URL with filters
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: filters.search || null,
+        status: filters.status?.length ? filters.status : null,
+        startDate: filters.startDate || null,
+        endDate: filters.endDate || null,
+        contactId: filters.contactId || null
+      },
+      queryParamsHandling: 'merge'
+    });
+
     this.loadInvoices();
   }
 
   loadInvoices() {
-    this.invoiceService.getInvoices().subscribe({
+    this.invoiceService.getInvoices(this.currentFilters).subscribe({
       next: (res: { data: { content: Invoice[] } }) =>
         (this.invoices = res.data.content),
       error: (err: any) => console.error(err),
@@ -190,6 +303,7 @@ export class InvoiceListComponent implements OnInit {
       }
     });
   }
+
   approve(invoice: Invoice) {
     if (
       confirm(

@@ -109,78 +109,169 @@
 /* ============================================
    Angular Material Overrides (Modals)
    ============================================ */
-
-/* ============================================
-   Angular Material Overrides (Modals)
-   ============================================ */
-/* ============================================
-   Angular Material Overrides (Modals)
-   ============================================ */
 .mat-mdc-dialog-container {
-  /* Force the container to be solid white using the standard variable */
   --mdc-dialog-container-color: #ffffff !important;
   --mdc-dialog-container-elevation: none !important;
   padding: 0 !important;
-  border-radius: 1.5rem !important; /* rounded-3xl */
-  overflow: hidden !important; /* Fix for rounded corners */
-  background-color: #ffffff !important; /* Fallback */
+  border-radius: 1.25rem !important; /* rounded-2xl */
+  overflow: hidden !important;
+  background-color: #ffffff !important;
 }
 
 .mat-mdc-dialog-surface {
-  background-color: #ffffff !important; /* Solid white */
+  background-color: #ffffff !important;
   box-shadow: none !important;
   display: flex !important;
   flex-direction: column !important;
-  @apply border border-slate-200 shadow-2xl shadow-slate-900/40 rounded-3xl overflow-hidden;
+  @apply border border-slate-200/60 shadow-2xl shadow-slate-900/20 rounded-2xl overflow-hidden;
 }
 
 .cdk-overlay-dark-backdrop {
-  background: rgba(15, 23, 42, 0.6) !important; /* Darker slate-900 for better contrast */
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.45) !important;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   opacity: 1 !important;
 }
 
 /* Header/Title */
 [mat-dialog-title] {
-  @apply m-0 p-6 text-xl font-bold text-slate-800 border-b border-slate-100 bg-white sticky top-0 z-10 !important;
+  @apply m-0 px-8 py-5 text-xl font-bold text-slate-900 border-b border-slate-100 bg-white sticky top-0 z-10 !important;
   @apply flex items-center justify-between;
   font-family: 'Inter', sans-serif !important;
-  letter-spacing: -0.025em;
 }
 
 /* Content Area */
 .mat-mdc-dialog-content {
-  max-height: 80vh !important;
-  @apply p-6 !important;
-  @apply text-slate-600 leading-relaxed;
-  overflow-y: auto !important; /* Ensure scrolling */
-  flex: 1 1 auto; /* Allow growth within flex container */
+  max-height: 85vh !important;
+  @apply p-8 !important;
+  @apply text-slate-600;
+  overflow-y: auto !important;
+  flex: 1 1 auto;
 }
 
 /* Actions Footer */
 .mat-mdc-dialog-actions {
-  @apply p-6 pt-4 border-t border-slate-100 bg-slate-50 !important; /* Solid background */
+  @apply px-8 py-5 border-t border-slate-100 bg-slate-50/50 !important;
   gap: 0.75rem;
   justify-content: flex-end !important;
-  flex: 0 0 auto; /* Prevent shrinking */
+  flex: 0 0 auto;
 }
 
-/* Action Buttons within Dialogs */
-.mat-mdc-dialog-actions button[mat-button],
-.mat-mdc-dialog-actions button[mat-stroked-button] {
-  @apply px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 active:scale-95 text-sm;
+.mat-mdc-icon-button {
+  @apply w-10 h-10 flex items-center justify-center p-0 !important;
 }
 
-/* Cancel / Secondary Action */
-.mat-mdc-dialog-actions button[mat-button] {
-  @apply text-slate-600 hover:text-slate-800 hover:bg-slate-100;
+.mat-mdc-icon-button mat-icon {
+  @apply !flex items-center justify-center !w-5 !h-5 !text-[20px] !leading-[20px] !m-0 !p-0 !static !bg-transparent;
 }
 
-/* Primary Action */
-.mat-mdc-dialog-actions button[mat-raised-button],
-.mat-mdc-dialog-actions button[color="primary"] {
-  @apply bg-primary-600 text-white shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 hover:bg-primary-700 !important;
+/* Standardized Premium Dialog Class */
+.premium-dialog .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: #ffffff !important;
+}
+
+.premium-dialog .mat-mdc-dialog-surface {
+    @apply rounded-3xl overflow-hidden border border-slate-200/60 shadow-2xl !important;
+}
+
+/* Material Form Field Polishing */
+.premium-dialog .mat-mdc-form-field {
+    @apply w-full mb-1 !important;
+}
+
+/*
+   FIX: Vertical artifacts in Material Outline
+   Standard Material Notch has segments. Overriding borders often creates double lines.
+*/
+.premium-dialog .mdc-notched-outline__leading,
+.premium-dialog .mdc-notched-outline__notch,
+.premium-dialog .mdc-notched-outline__trailing {
+    @apply border-slate-200 transition-colors duration-200 !important;
+    border-top-width: 1px !important;
+    border-bottom-width: 1px !important;
+}
+
+.premium-dialog .mdc-notched-outline__leading {
+    border-left-width: 1px !important;
+    border-right-width: 0 !important;
+}
+
+.premium-dialog .mdc-notched-outline__notch {
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+}
+
+.premium-dialog .mdc-notched-outline__trailing {
+    border-right-width: 1px !important;
+    border-left-width: 0 !important;
+}
+
+/* Focused States */
+.premium-dialog .mat-focused .mdc-notched-outline__leading,
+.premium-dialog .mat-focused .mdc-notched-outline__notch,
+.premium-dialog .mat-focused .mdc-notched-outline__trailing {
+    @apply border-primary-500 !important;
+    border-top-width: 1.5px !important;
+    border-bottom-width: 1.5px !important;
+}
+
+.premium-dialog .mat-focused .mdc-notched-outline__leading {
+    border-left-width: 1.5px !important;
+}
+
+.premium-dialog .mat-focused .mdc-notched-outline__trailing {
+    border-right-width: 1.5px !important;
+}
+
+/* Label Refinement */
+.premium-dialog .mat-mdc-form-field-label {
+    @apply text-slate-500 font-medium !important;
+}
+
+.premium-dialog .mat-focused .mat-mdc-form-field-label {
+    @apply text-primary-600 font-semibold !important;
+}
+
+/* Subscript Hide (Cleaner Look) */
+.premium-dialog .mat-mdc-form-field-subscript-wrapper {
+    @apply hidden !important;
+}
+
+.premium-dialog .mat-mdc-form-field-error-wrapper,
+.premium-dialog .mat-mdc-form-field-hint-wrapper {
+    @apply block !important;
+}
+
+/* Scrollbar Refinement */
+.mat-mdc-dialog-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.mat-mdc-dialog-content::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.mat-mdc-dialog-content::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+}
+
+/* Datepicker & Select Popups */
+.mat-mdc-select-panel, .mat-datepicker-content {
+    @apply shadow-2xl border border-slate-200/60 rounded-xl overflow-hidden !important;
+    background-color: white !important;
+}
+
+.mat-mdc-option {
+    @apply py-3 px-4 text-sm transition-colors duration-150 !important;
+    min-height: 44px !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+    @apply bg-primary-50 !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) .mdc-list-item__primary-text {
+    @apply text-primary-700 font-semibold !important;
 }
 
 /* Scrollbar Refinement */
@@ -194,63 +285,91 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300/50 rounded-full hover:bg-slate-400;
-}
-
-/* Standardized Premium Dialog Class */
-.premium-dialog .mat-mdc-dialog-container {
-    --mdc-dialog-container-color: #ffffff !important;
-    background-color: #ffffff !important;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
-}
-
-.premium-dialog .mat-mdc-dialog-surface {
-    background-color: #ffffff !important;
-    overflow: hidden !important;
-    border-radius: 1.5rem !important;
-}
-
-/* Fix for Datepicker Z-Index in Modals */
-.cdk-global-overlay-wrapper, .cdk-overlay-container {
-    z-index: 9999 !important;
-}
-
-.mat-datepicker-content {
-    background-color: white;
-    @apply shadow-xl border border-slate-200 rounded-xl;
+  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
 }
 
 /* ============================================
-   Form Field Fixes for Modals
+   Fix for Overlays Within Dialogs (Datepicker, Dropdowns)
    ============================================ */
-.premium-dialog .mat-mdc-form-field {
-    width: 100%;
+
+/*
+ * Z-INDEX HIERARCHY (AGGRESSIVE):
+ * - Dialog backdrop: 9999
+ * - Dialog wrapper: 10000
+ * - Datepicker/Select bounding boxes: 11000+ (MUST be above dialog)
+ *
+ * Angular Material sets inline styles, so we need very high specificity.
+ */
+
+/* CRITICAL: The connected position bounding box (wraps datepicker/select popups) */
+/* Using attribute selector for higher specificity to override Material's inline styles */
+div.cdk-overlay-connected-position-bounding-box[dir] {
+    z-index: 11000 !important;
 }
 
-/* Reset line-height to prevent "leading-relaxed" from breaking label positioning */
-.premium-dialog .mat-mdc-form-field-subscript-wrapper,
-.premium-dialog .mat-mdc-text-field-wrapper,
-.premium-dialog .mdc-text-field__input,
-.premium-dialog .mat-mdc-form-field-label {
-    line-height: normal !important;
+.cdk-overlay-connected-position-bounding-box {
+    z-index: 11000 !important;
+    position: fixed !important;
 }
 
-/* Ensure labels don't get struck through by the outline border */
-.premium-dialog .mat-mdc-floating-label {
-    background-color: white;
-    padding: 0 4px; /* Add some breathing room around the text */
-    margin-left: -4px; /* Compensate for padding to keep alignment */
-    z-index: 10; /* Ensure it sits on top of the border if notch fails */
+/* Overlay container - needs to be high */
+.cdk-overlay-container {
+    z-index: 10500 !important;
 }
 
-/* Adjust the input padding inside standard outline to match premium look if needed */
-.premium-dialog .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-text-field__input {
-    padding-top: 12px;
-    padding-bottom: 12px;
+/* The overlay pane inside bounding boxes (for datepicker/select) */
+.cdk-overlay-connected-position-bounding-box .cdk-overlay-pane {
+    z-index: 11001 !important;
 }
 
-/* Fix for "Text half into other fields" - ensure proper spacing */
-.premium-dialog .mat-mdc-form-field-subscript-wrapper {
-    /* If dynamic sizing is used, sometimes it helps to ensure it takes no space if empty */
-    position: absolute;
+/* Dialog wrapper stays at base level */
+.cdk-global-overlay-wrapper {
+    z-index: 10000 !important;
+}
+
+/* Dialog backdrop stays lower */
+.cdk-overlay-backdrop.cdk-overlay-dark-backdrop {
+    z-index: 9999 !important;
+}
+
+/* Datepicker content - ensure it's visible and above dialog */
+.mat-datepicker-content {
+    z-index: 11002 !important;
+    position: relative !important;
+}
+
+/* mat-datepicker-popup class if present */
+.mat-datepicker-popup {
+    z-index: 11002 !important;
+}
+
+/* Native select panels (handled by browser, but parent must not clip) */
+.mat-mdc-dialog-container,
+.mat-mdc-dialog-surface,
+.mat-mdc-dialog-content,
+mat-dialog-content {
+    overflow: visible !important;
+}
+
+/* mat-select panel visibility */
+.mat-mdc-select-panel {
+    z-index: 11002 !important;
+    min-width: 200px !important;
+    max-width: 90vw !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+}
+
+/* Ensure mat-option items are visible */
+.mat-mdc-option {
+    display: flex !important;
+    visibility: visible !important;
+}
+
+/* Transparent backdrop should not block clicks */
+.cdk-overlay-backdrop.cdk-overlay-transparent-backdrop {
+    background: transparent !important;
+    pointer-events: none !important;
+    z-index: 10999 !important;
 }

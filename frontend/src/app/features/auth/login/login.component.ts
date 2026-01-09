@@ -68,7 +68,12 @@ export class LoginComponent {
 
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
-          this.router.navigate(['/dashboard']);
+          const role = this.authService.getUserRole();
+          if (role === 'CLIENT' || role === 'ROLE_CLIENT') {
+            this.router.navigate(['/portal']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         },
         error: (err) => {
           this.isLoading = false;

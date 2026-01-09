@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-05T23:23:37-0500",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251118-1623, environment: Java 21.0.9 (Eclipse Adoptium)"
+    date = "2026-01-08T22:37:17-0500",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Amazon.com Inc.)"
 )
 @Component
 public class TaskMapperImpl implements TaskMapper {
@@ -25,12 +25,12 @@ public class TaskMapperImpl implements TaskMapper {
 
         taskDto.setJobId( taskJobId( task ) );
         taskDto.setJobName( taskJobName( task ) );
-        taskDto.setAssigneeId( task.getAssigneeId() );
-        taskDto.setCompleted( task.isCompleted() );
-        taskDto.setDescription( task.getDescription() );
-        taskDto.setDueDate( task.getDueDate() );
         taskDto.setId( task.getId() );
         taskDto.setTitle( task.getTitle() );
+        taskDto.setDescription( task.getDescription() );
+        taskDto.setCompleted( task.isCompleted() );
+        taskDto.setDueDate( task.getDueDate() );
+        taskDto.setAssigneeId( task.getAssigneeId() );
 
         return taskDto;
     }
@@ -44,11 +44,11 @@ public class TaskMapperImpl implements TaskMapper {
         Task task = new Task();
 
         task.setId( dto.getId() );
-        task.setAssigneeId( dto.getAssigneeId() );
-        task.setCompleted( dto.isCompleted() );
-        task.setDescription( dto.getDescription() );
-        task.setDueDate( dto.getDueDate() );
         task.setTitle( dto.getTitle() );
+        task.setDescription( dto.getDescription() );
+        task.setCompleted( dto.isCompleted() );
+        task.setDueDate( dto.getDueDate() );
+        task.setAssigneeId( dto.getAssigneeId() );
 
         return task;
     }

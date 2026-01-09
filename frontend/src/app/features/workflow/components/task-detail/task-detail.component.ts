@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { Task } from '../../../../core/models/task.model';
 import { JobService } from '../../../../core/services/job.service';
@@ -23,6 +24,7 @@ import { JobService } from '../../../../core/services/job.service';
     MatCheckboxModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatIconModule,
     FormsModule
   ],
   templateUrl: './task-detail.component.html',

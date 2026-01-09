@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -79,12 +79,20 @@ import { AuthService } from '../../auth/auth.service';
         </a>
 
         <div class="nav-section-label">Reports</div>
-        <a routerLink="/reports" routerLinkActive="nav-active"
+        <a routerLink="/reports" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}"
            class="nav-item group">
           <div class="nav-icon-container">
             <span class="material-icons nav-icon">assessment</span>
           </div>
           <span class="nav-text">Financial Reports</span>
+        </a>
+
+        <a routerLink="/reports/aging" routerLinkActive="nav-active"
+           class="nav-item group">
+          <div class="nav-icon-container">
+            <span class="material-icons nav-icon">schedule</span>
+          </div>
+          <span class="nav-text">Aging Reports</span>
         </a>
 
         <div class="nav-section-label">System</div>
@@ -113,12 +121,12 @@ import { AuthService } from '../../auth/auth.service';
             <div class="relative group cursor-pointer">
               <div class="absolute -inset-1 bg-gradient-to-r from-primary-400 to-accent-400 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
               <div class="relative h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center text-sm font-bold text-white border border-white/10 ring-2 ring-white/5">
-                JD
+                {{ userInitials }}
               </div>
             </div>
             <div class="flex flex-col">
-              <span class="text-sm font-semibold text-white">John Doe</span>
-              <span class="text-[10px] text-slate-400 font-medium">Administrator</span>
+              <span class="text-sm font-semibold text-white">{{ currentUser()?.name || 'User' }}</span>
+              <span class="text-[10px] text-slate-400 font-medium">{{ currentUser()?.role || 'Member' }}</span>
             </div>
           </div>
           <button (click)="logout()"
@@ -171,7 +179,20 @@ import { AuthService } from '../../auth/auth.service';
    `]
 })
 export class SidebarComponent {
-  constructor(private authService: AuthService) {}
+  private authService = inject(AuthService);
+  currentUser = this.authService.currentUser;
+
+  constructor() {}
+
+  get userInitials(): string {
+    const user = this.currentUser();
+    if (!user) return '??';
+    const parts = user.name.split(' ');
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return user.name.substring(0, 2).toUpperCase();
+  }
 
   logout() {
     this.authService.logout();

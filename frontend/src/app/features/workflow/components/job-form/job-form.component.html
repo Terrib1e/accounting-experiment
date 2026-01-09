@@ -1,53 +1,104 @@
-<h2 mat-dialog-title>{{ isEditing ? 'Edit Job' : 'Create New Job' }}</h2>
+<div class="premium-dialog flex flex-col h-full bg-white">
+  <!-- Header -->
+  <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 z-50 bg-white">
+    <div class="flex items-center gap-4">
+      <div class="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center border border-primary-100/30">
+        <mat-icon class="text-primary-600 scale-90">{{ isEditing ? 'edit_note' : 'add_task' }}</mat-icon>
+      </div>
+      <div class="flex flex-col">
+        <h2 class="text-slate-900 text-lg font-bold tracking-tight leading-none m-0">{{ isEditing ? 'Edit' : 'Create' }} Job</h2>
+        <span class="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest flex items-center gap-1.5 leading-none">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary-500"></span> Workflow Process
+        </span>
+      </div>
+    </div>
+    <button mat-icon-button (click)="onCancel()" class="hover:bg-slate-50 transition-all rounded-xl text-slate-400">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-<mat-dialog-content>
-  <form [formGroup]="form" id="job-form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 min-w-[400px] py-2">
+  <mat-dialog-content class="!p-0 !m-0 bg-slate-50/30">
+    <form [formGroup]="form" id="job-form" (ngSubmit)="onSubmit()" class="flex flex-col gap-10 p-8">
 
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Job Name</mat-label>
-      <input matInput formControlName="name" placeholder="e.g., John Doe - 2024 Tax Return">
-      <mat-error *ngIf="form.get('name')?.hasError('required')">Job name is required</mat-error>
-    </mat-form-field>
+      <!-- Primary Info -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-2 px-1">
+          <div class="w-1 h-4 bg-primary-500 rounded-full"></div>
+          <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none">Primary Identification</h3>
+        </div>
+        <div class="p-6 bg-white rounded-3xl border border-slate-200/60 shadow-sm">
+          <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-label>Project or Job Name</mat-label>
+            <input matInput formControlName="name" placeholder="e.g., John Doe - 2024 Tax Return Preparation" required>
+          </mat-form-field>
+        </div>
+      </div>
 
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Workflow</mat-label>
-      <mat-select formControlName="workflowId">
-        <mat-option *ngFor="let wf of workflows" [value]="wf.id">
-          {{ wf.name }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="form.get('workflowId')?.hasError('required')">Please select a workflow</mat-error>
-    </mat-form-field>
+      <!-- Assignment & Workflow -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-2 px-1">
+          <div class="w-1 h-4 bg-primary-500 rounded-full"></div>
+          <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none">Logistics & Assignment</h3>
+        </div>
+        <div class="p-6 bg-white rounded-3xl border border-slate-200/60 shadow-sm grid grid-cols-2 gap-6">
 
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Client</mat-label>
-      <mat-select formControlName="contactId">
-        <mat-option *ngFor="let contact of contacts" [value]="contact.id">
-          {{ contact.name }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="form.get('contactId')?.hasError('required')">Please select a client</mat-error>
-    </mat-form-field>
+          <div class="col-span-2 md:col-span-1">
+            <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+              <mat-label>Service Workflow</mat-label>
+              <select matNativeControl formControlName="workflowId" required title="Service Workflow">
+                <option value="" disabled selected>Select Workflow</option>
+                <option *ngFor="let wf of workflows" [value]="wf.id">
+                  {{ wf.name }}
+                </option>
+              </select>
+            </mat-form-field>
+          </div>
 
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Due Date</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="dueDate" placeholder="Due Date">
-      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field>
+          <div class="col-span-2 md:col-span-1">
+            <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+              <mat-label>Associated Client</mat-label>
+              <select matNativeControl formControlName="contactId" required title="Associated Client">
+                <option value="" disabled selected>Select Client</option>
+                <option *ngFor="let contact of contacts" [value]="contact.id">
+                  {{ contact.name }}
+                </option>
+              </select>
+            </mat-form-field>
+          </div>
 
-    <!-- Assignee would need a user list, placeholder for now -->
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Assignee ID (optional)</mat-label>
-      <input matInput formControlName="assigneeId" placeholder="User ID">
-    </mat-form-field>
+          <div class="col-span-2 md:col-span-1">
+            <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+              <mat-label>Deadline / Due Date</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="dueDate" placeholder="Due Date">
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </div>
 
-  </form>
-</mat-dialog-content>
+          <div class="col-span-2 md:col-span-1">
+            <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+              <mat-label>Internal Owner ID</mat-label>
+              <input matInput formControlName="assigneeId" placeholder="Assignee User ID">
+            </mat-form-field>
+          </div>
 
-<mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || isLoading">
-    {{ isLoading ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
-  </button>
-</mat-dialog-actions>
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="!px-8 !py-6 bg-white border-t border-slate-100">
+    <button mat-button (click)="onCancel()" class="!rounded-xl !px-6 h-12 !text-slate-500 hover:bg-slate-50 font-bold transition-all">Cancel</button>
+    <button mat-flat-button color="primary"
+            (click)="onSubmit()"
+            [disabled]="form.invalid || isLoading"
+            class="!min-w-[180px] !bg-primary-600 !text-white !rounded-xl !h-12 shadow-xl shadow-primary-500/10 hover:shadow-xl transition-all font-bold">
+      <div class="flex items-center justify-center gap-2">
+        <mat-icon *ngIf="!isLoading" class="!text-lg">{{ isEditing ? 'save' : 'add_task' }}</mat-icon>
+        <mat-spinner diameter="20" *ngIf="isLoading" strokeWidth="3" class="!text-white"></mat-spinner>
+        <span class="tracking-tight">{{ isLoading ? 'Saving...' : (isEditing ? 'Update Job' : 'Create Job') }}</span>
+      </div>
+    </button>
+  </mat-dialog-actions>
+</div>

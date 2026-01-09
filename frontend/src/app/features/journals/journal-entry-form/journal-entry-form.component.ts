@@ -34,116 +34,188 @@ import { AbsPipe } from '../../../shared/pipes/abs.pipe';
     AbsPipe
   ],
   template: `
-    <h2 mat-dialog-title>
-        <div class="flex flex-col">
-            <span>{{ data ? 'Edit' : 'New' }} Journal Entry</span>
-            <span class="text-xs font-medium text-slate-500 uppercase tracking-widest mt-1 font-sans">Ledger Entry Details</span>
+    <div class="premium-dialog flex flex-col h-full bg-white text-slate-900">
+        <!-- Header -->
+        <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 z-50 bg-white">
+            <div class="flex items-center gap-4">
+                <div class="w-11 h-11 bg-slate-900 rounded-xl flex items-center justify-center border border-slate-800">
+                    <mat-icon class="text-white scale-90">{{ data ? 'edit_note' : 'post_add' }}</mat-icon>
+                </div>
+                <div class="flex flex-col">
+                    <h2 class="text-slate-900 text-lg font-bold tracking-tight leading-none m-0">{{ data ? 'Edit' : 'New' }} Journal Entry</h2>
+                    <span class="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest flex items-center gap-1.5 leading-none">
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary-500"></span> General Ledger Transaction
+                    </span>
+                </div>
+            </div>
+            <button mat-icon-button (click)="dialogRef.close()" class="hover:bg-slate-50 transition-all rounded-xl text-slate-400">
+                <mat-icon>close</mat-icon>
+            </button>
         </div>
-        <button mat-icon-button (click)="dialogRef.close()">
-            <mat-icon>close</mat-icon>
-        </button>
-    </h2>
 
-    <mat-dialog-content>
-        <form [formGroup]="form" id="journal-form" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
-            <!-- Header Fields -->
-            <div class="grid grid-cols-12 gap-6">
-                <div class="col-span-4 space-y-1">
-                  <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Entry Date</label>
-                  <div class="relative">
-                    <input matInput [matDatepicker]="picker" formControlName="entryDate" class="form-input-premium pl-11">
-                    <mat-datepicker-toggle matIconSuffix [for]="picker" class="absolute left-1 top-1/2 -translate-y-1/2 text-slate-400"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                  </div>
+    <mat-dialog-content class="!p-0 !m-0 bg-slate-50/30">
+        <form [formGroup]="form" id="journal-form" (ngSubmit)="onSubmit()" class="flex flex-col gap-10 p-8">
+
+            <!-- Metadata Section -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 px-1">
+                    <div class="w-1 h-4 bg-primary-500 rounded-full"></div>
+                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none">Entry Metadata</label>
                 </div>
+                <div class="p-6 bg-white rounded-3xl border border-slate-200/60 shadow-sm grid grid-cols-12 gap-5">
+                    <div class="col-span-12 md:col-span-4">
+                        <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                            <mat-label>Posting Date</mat-label>
+                            <input matInput [matDatepicker]="picker" formControlName="entryDate" required>
+                            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+                    </div>
 
-                <div class="col-span-8 space-y-1">
-                  <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Reference Number</label>
-                  <input formControlName="referenceNumber" class="form-input-premium" placeholder="e.g. JE-2024-001">
-                </div>
+                    <div class="col-span-12 md:col-span-8">
+                        <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                            <mat-label>Reference Number</mat-label>
+                            <input matInput formControlName="referenceNumber" placeholder="e.g. JE-2024-001">
+                        </mat-form-field>
+                    </div>
 
-                <div class="col-span-12 space-y-1">
-                  <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Description</label>
-                  <textarea formControlName="description" rows="2" class="form-input-premium resize-none" placeholder="Provide a detailed description of this entry..."></textarea>
+                    <div class="col-span-12">
+                        <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                            <mat-label>Internal Memo / Description</mat-label>
+                            <textarea matInput formControlName="description" rows="2" class="resize-none" placeholder="Provide a detailed explanation for this manual entry..."></textarea>
+                        </mat-form-field>
+                    </div>
                 </div>
             </div>
 
             <!-- Lines Section -->
-            <div class="space-y-3">
-               <div class="flex items-center justify-between">
-                  <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest m-0">Line Items</h3>
-                  <app-button type="button" variant="secondary" size="sm" icon="add" (onClick)="addLine()">Add Line</app-button>
-               </div>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between px-1">
+                    <div class="flex items-center gap-2">
+                        <div class="w-1 h-4 bg-primary-500 rounded-full"></div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none">Double Entry Ledger</label>
+                    </div>
+                    <button mat-stroked-button type="button" (click)="addLine()" class="!rounded-xl !border-slate-200 !text-slate-600 hover:!bg-slate-50 !font-bold !text-[11px] !py-1 h-8">
+                        <mat-icon class="!text-sm !w-4 !h-4 !min-w-[16px] !min-h-[16px] !m-0">add</mat-icon>
+                        <span class="ml-1 uppercase">Add Line</span>
+                    </button>
+                </div>
 
-               <div class="table-container shadow-sm border border-slate-200">
-                  <table class="w-full text-left">
-                      <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200">
-                          <tr>
-                              <th class="px-4 py-2 w-[35%]">Account</th>
-                              <th class="px-4 py-2">Description</th>
-                              <th class="px-4 py-2 w-32 text-right">Debit</th>
-                              <th class="px-4 py-2 w-32 text-right">Credit</th>
-                              <th class="px-4 py-2 w-10"></th>
-                          </tr>
-                      </thead>
-                      <tbody formArrayName="lines" class="divide-y divide-slate-100">
-                          <tr *ngFor="let line of lines.controls; let i=index" [formGroupName]="i" class="group hover:bg-slate-50/50 transition-colors">
-                              <td class="px-2 py-2">
-                                  <select formControlName="accountId" class="form-input-premium !py-1.5 !px-2 !text-sm !rounded-lg border-transparent hover:border-slate-200 bg-transparent">
-                                      <option value="" disabled>Select Account</option>
-                                      <option *ngFor="let acc of accounts" [value]="acc.id">
-                                          {{acc.code}} - {{acc.name}}
-                                      </option>
-                                  </select>
-                              </td>
-                              <td class="px-2 py-2">
-                                  <input formControlName="description" class="form-input-premium !py-1.5 !px-2 !text-sm !rounded-lg border-transparent hover:border-slate-200 bg-transparent" placeholder="Line description">
-                              </td>
-                              <td class="px-2 py-2 text-right">
-                                  <input type="number" formControlName="debit" class="form-input-premium !py-1.5 !px-2 !text-sm !rounded-lg border-transparent hover:border-slate-200 bg-transparent text-right font-bold text-slate-700" placeholder="0.00">
-                              </td>
-                              <td class="px-2 py-2 text-right">
-                                  <input type="number" formControlName="credit" class="form-input-premium !py-1.5 !px-2 !text-sm !rounded-lg border-transparent hover:border-slate-200 bg-transparent text-right font-bold text-slate-700" placeholder="0.00">
-                              </td>
-                              <td class="px-2 py-2 text-center">
-                                  <button type="button" (click)="removeLine(i)" class="p-1 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100">
-                                      <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-[18px]">delete_outline</mat-icon>
-                                  </button>
-                              </td>
-                          </tr>
-                      </tbody>
-                      <tfoot class="bg-slate-50/50 border-t border-slate-200 text-xs font-bold">
-                          <tr>
-                              <td colspan="2" class="px-4 py-3 uppercase tracking-widest text-slate-400">Total Balance</td>
-                              <td class="px-4 py-3 text-right" [class.text-red-500]="totals.debit !== totals.credit">
-                                  {{totals.debit | currency}}
-                              </td>
-                              <td class="px-4 py-3 text-right" [class.text-red-500]="totals.debit !== totals.credit">
-                                  {{totals.credit | currency}}
-                              </td>
-                              <td></td>
-                          </tr>
-                      </tfoot>
-                  </table>
-               </div>
+                <div class="overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm mx-1">
+                   <table class="w-full text-left border-collapse">
+                       <thead>
+                           <tr class="bg-slate-50 border-b border-slate-100">
+                               <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-[30%]">Account</th>
+                               <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Description</th>
+                               <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-32 text-right">Debit</th>
+                               <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-32 text-right">Credit</th>
+                               <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-12 text-center"></th>
+                           </tr>
+                       </thead>
+                       <tbody formArrayName="lines" class="divide-y divide-slate-50">
+                           <tr *ngFor="let line of lines.controls; let i=index" [formGroupName]="i" class="group hover:bg-slate-50/40 transition-colors">
+                               <td class="px-4 py-3">
+                                   <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                                       <mat-select formControlName="accountId" placeholder="Select Account" required>
+                                           <mat-option *ngFor="let acc of accounts" [value]="acc.id">
+                                               <div class="flex items-center gap-2">
+                                                   <span class="px-2 py-0.5 bg-slate-100 text-[10px] font-mono rounded-md text-slate-600 font-bold uppercase">{{acc.code}}</span>
+                                                   <span class="text-sm text-slate-700">{{acc.name}}</span>
+                                               </div>
+                                           </mat-option>
+                                       </mat-select>
+                                   </mat-form-field>
+                               </td>
+                               <td class="px-4 py-3">
+                                   <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                                       <input matInput formControlName="description" placeholder="Line detail">
+                                   </mat-form-field>
+                               </td>
+                               <td class="px-4 py-3">
+                                   <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                                       <input matInput type="number" formControlName="debit" class="text-right font-bold text-emerald-600">
+                                   </mat-form-field>
+                               </td>
+                               <td class="px-4 py-3">
+                                   <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                                       <input matInput type="number" formControlName="credit" class="text-right font-bold text-rose-600">
+                                   </mat-form-field>
+                               </td>
+                               <td class="px-4 py-3 text-center">
+                                   <button type="button" mat-icon-button (click)="removeLine(i)"
+                                           class="text-slate-300 hover:text-rose-500 transition-all opacity-0 group-hover:opacity-100"
+                                           [disabled]="lines.length <= 2">
+                                       <mat-icon class="!text-lg">delete_outline</mat-icon>
+                                   </button>
+                               </td>
+                           </tr>
+                       </tbody>
+                       <tfoot class="bg-primary-950 border-t border-primary-900 text-white">
+                           <tr>
+                               <td colspan="2" class="px-8 py-6">
+                                      <div class="flex items-center gap-4">
+                                          <div [class.bg-emerald-500]="totals.debit === totals.credit"
+                                               [class.bg-rose-500]="totals.debit !== totals.credit"
+                                               class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg transition-colors border border-white/10">
+                                              <mat-icon class="text-white !text-lg">{{ totals.debit === totals.credit ? 'balance' : 'warning' }}</mat-icon>
+                                          </div>
+                                          <div class="flex flex-col">
+                                              <span class="text-[10px] text-primary-400 uppercase tracking-widest font-bold">Ledger Balance Status</span>
+                                              <span class="text-xs font-bold" [class.text-emerald-400]="totals.debit === totals.credit" [class.text-rose-400]="totals.debit !== totals.credit">
+                                                  {{ totals.debit === totals.credit ? 'Journal Entries Balanced' : 'Out of Balance: ' + ((totals.debit - totals.credit) | abs | currency) }}
+                                              </span>
+                                          </div>
+                                      </div>
+                               </td>
+                               <td class="px-6 py-6 text-right border-l border-white/5">
+                                   <div class="flex flex-col items-end">
+                                       <span class="text-[10px] text-primary-400 uppercase tracking-widest font-bold">Total Debits</span>
+                                       <span class="text-xl font-bold tracking-tight text-white">{{ totals.debit | currency }}</span>
+                                   </div>
+                               </td>
+                               <td class="px-6 py-6 text-right">
+                                   <div class="flex flex-col items-end">
+                                       <span class="text-[10px] text-primary-400 uppercase tracking-widest font-bold">Total Credits</span>
+                                       <span class="text-xl font-bold tracking-tight text-white">{{ totals.credit | currency }}</span>
+                                   </div>
+                               </td>
+                               <td></td>
+                           </tr>
+                       </tfoot>
+                   </table>
+                </div>
             </div>
 
-            <div *ngIf="totals.debit !== totals.credit" class="bg-red-50 text-red-700 px-4 py-3 rounded-xl border border-red-100 text-xs font-bold flex items-center gap-3 animate-slide-up">
-              <div class="h-5 w-5 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                 <mat-icon class="text-red-600 !text-xs !w-3 !h-3 leading-3">priority_high</mat-icon>
-              </div>
-              <span class="uppercase tracking-widest">Out of balance by {{ (totals.debit - totals.credit) | abs | currency }}</span>
+            <div *ngIf="totals.debit !== totals.credit"
+                 class="mx-1 bg-rose-50 text-rose-700 px-6 py-4 rounded-2xl border border-rose-100 text-[10px] font-bold flex items-center justify-between animate-in fade-in slide-in-from-bottom-2">
+                <div class="flex items-center gap-3">
+                    <mat-icon class="text-rose-500 !text-lg !w-5 !h-5">warning</mat-icon>
+                    <span class="uppercase tracking-[0.15em]">ENTRY MUST BE BALANCED TO POST TO THE LEDGER</span>
+                </div>
+                <span class="bg-rose-100 px-3 py-1 rounded-full font-mono">VARIANCE: {{ (totals.debit - totals.credit) | abs | currency }}</span>
             </div>
         </form>
     </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
-        <app-button variant="secondary" (onClick)="dialogRef.close()">Discard</app-button>
-        <app-button variant="primary" (onClick)="onSubmit()" [disabled]="form.invalid || totals.debit !== totals.credit">
-            Post Journal Entry
-        </app-button>
+    <mat-dialog-actions class="!px-8 !py-6 bg-white border-t border-slate-100">
+        <button mat-button (click)="dialogRef.close()" class="!rounded-xl !px-6 h-12 !text-slate-500 hover:bg-slate-50 font-bold transition-all">Discard</button>
+        <button mat-flat-button color="primary"
+                (click)="onSubmit()"
+                [disabled]="form.invalid || totals.debit !== totals.credit"
+                class="!min-w-[200px] !bg-primary-600 !text-white !rounded-xl !h-12 shadow-xl shadow-primary-500/10 hover:shadow-xl transition-all font-bold">
+            <div class="flex items-center justify-center gap-2">
+                <mat-icon class="!text-lg">vignette</mat-icon>
+                <span class="tracking-tight">Post Journal Entry</span>
+            </div>
+        </button>
     </mat-dialog-actions>
-  `
+    </div>
+  `,
+  styles: [`
+    ::ng-deep .premium-dialog .mat-mdc-dialog-content {
+      overflow-x: hidden !important;
+    }
+  `]
 })
 
 export class JournalEntryFormComponent implements OnInit {

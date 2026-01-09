@@ -42,6 +42,22 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
           </div>
 
           <app-button (onClick)="runReport()" [loading]="loading">Run Report</app-button>
+
+          <!-- Export Buttons -->
+          <div *ngIf="report" class="flex space-x-2 ml-auto">
+            <button (click)="exportPdf()"
+                    [disabled]="exporting"
+                    class="inline-flex items-center px-3 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors disabled:opacity-50">
+              <span class="material-icons text-base mr-1">picture_as_pdf</span>
+              PDF
+            </button>
+            <button (click)="exportExcel()"
+                    [disabled]="exporting"
+                    class="inline-flex items-center px-3 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-100 transition-colors disabled:opacity-50">
+              <span class="material-icons text-base mr-1">table_chart</span>
+              Excel
+            </button>
+          </div>
       </div>
 
       <!-- Report Output -->
@@ -88,6 +104,7 @@ export class ReportViewComponent {
 
   report: FinancialReport | null = null;
   loading = false;
+  exporting = false;
 
   constructor(private reportService: ReportService) {}
 
@@ -116,18 +133,79 @@ export class ReportViewComponent {
       }
   }
 
+  exportPdf() {
+    this.exporting = true;
+    let observable;
+    let filename: string;
+
+    if (this.selectedReport === 'BALANCE_SHEET') {
+      observable = this.reportService.exportBalanceSheetPdf(this.startDate);
+      filename = 'balance-sheet.pdf';
+    } else if (this.selectedReport === 'INCOME_STATEMENT') {
+      observable = this.reportService.exportIncomeStatementPdf(this.startDate, this.endDate);
+      filename = 'income-statement.pdf';
+    } else {
+      observable = this.reportService.exportTrialBalancePdf(this.startDate);
+      filename = 'trial-balance.pdf';
+    }
+
+    observable.subscribe({
+      next: (blob) => {
+        this.downloadFile(blob, filename);
+        this.exporting = false;
+      },
+      error: (err) => {
+        console.error('Error exporting PDF:', err);
+        this.exporting = false;
+      }
+    });
+  }
+
+  exportExcel() {
+    this.exporting = true;
+    let observable;
+    let filename: string;
+
+    if (this.selectedReport === 'BALANCE_SHEET') {
+      observable = this.reportService.exportBalanceSheetExcel(this.startDate);
+      filename = 'balance-sheet.xlsx';
+    } else if (this.selectedReport === 'INCOME_STATEMENT') {
+      observable = this.reportService.exportIncomeStatementExcel(this.startDate, this.endDate);
+      filename = 'income-statement.xlsx';
+    } else {
+      observable = this.reportService.exportTrialBalanceExcel(this.startDate);
+      filename = 'trial-balance.xlsx';
+    }
+
+    observable.subscribe({
+      next: (blob) => {
+        this.downloadFile(blob, filename);
+        this.exporting = false;
+      },
+      error: (err) => {
+        console.error('Error exporting Excel:', err);
+        this.exporting = false;
+      }
+    });
+  }
+
+  private downloadFile(blob: Blob, filename: string) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
   objectKeys(obj: any): string[] {
       return Object.keys(obj);
   }
 
   getSectionTotal(sectionName: string): number {
-      // In a real app the DTO might have section totals or strict structure.
-      // Here we trust the 'summary' map usually, but for section totals we can sum on FE if DTO doesn't provide.
-      // Looking at backend, summary has "Total Assets", etc. but mapping generic section name "Assets" to "Total Assets" is loose.
-      // Let's summing children.
       if (!this.report) return 0;
-      // Import { ReportLine } if needed or use 'any' if ReportLine not exported
-      // But ReportLine IS exported in report.model.ts
       return this.report.sections[sectionName].reduce((acc: number, line: any) => acc + (line.balance || 0), 0);
   }
 }

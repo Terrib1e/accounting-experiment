@@ -3,6 +3,7 @@ import { MainLayoutComponent } from './core/layout/main-layout/main-layout.compo
 import { AuthLayoutComponent } from './core/layout/auth-layout/auth-layout.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { authGuard } from './core/auth/auth.guard';
+import { clientGuard } from './core/auth/client.guard';
 import { RegisterComponent } from './features/auth/register/register.component';
 
 export const routes: Routes = [
@@ -105,6 +106,21 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'reports/aging',
+        loadComponent: () =>
+          import(
+            './features/reports/aging-report/aging-report.component'
+          ).then((m) => m.AgingReportComponent),
+      },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import(
+            './features/notifications/notification-list/notification-list.component'
+          ).then((m) => m.NotificationListComponent),
+      },
+
+      {
         path: 'settings/organization',
         loadComponent: () =>
           import(
@@ -133,7 +149,7 @@ export const routes: Routes = [
       import('./core/layout/portal-layout/portal-layout.component').then(
         (m) => m.PortalLayoutComponent
       ),
-    // canActivate: [clientGuard], // Uncomment once clientGuard is wired
+    canActivate: [clientGuard],
     children: [
       {
         path: '',

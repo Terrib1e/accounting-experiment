@@ -27,3 +27,5 @@ databaseChangeLog:
       file: db/changelog/changes/013-add-contact-to-users.yaml
   - include:
       file: db/changelog/changes/014-add-amount-paid-to-invoices.yaml
+  - include:
+      file: db/changelog/changes/015-create-notifications-table.yaml

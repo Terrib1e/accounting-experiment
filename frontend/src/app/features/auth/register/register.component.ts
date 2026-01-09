@@ -86,9 +86,12 @@ export class RegisterComponent {
 
       this.authService.register(this.registerForm.value).subscribe({
         next: () => {
-          this.router.navigate(['/dashboard']);
-          // Optional: Show success message/toast
-          // alert('Registration successful! Please sign in.');
+          const role = this.authService.getUserRole();
+          if (role === 'CLIENT' || role === 'ROLE_CLIENT') {
+            this.router.navigate(['/portal']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         },
         error: (err) => {
           this.isLoading = false;

@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-05T23:23:37-0500",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251118-1623, environment: Java 21.0.9 (Eclipse Adoptium)"
+    date = "2026-01-08T22:37:17-0500",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Amazon.com Inc.)"
 )
 @Component
 public class JournalEntryMapperImpl extends JournalEntryMapper {
@@ -27,9 +27,9 @@ public class JournalEntryMapperImpl extends JournalEntryMapper {
         JournalEntryDto journalEntryDto = new JournalEntryDto();
 
         journalEntryDto.setLines( journalEntryLineListToJournalEntryLineDtoList( entry.getLines() ) );
-        journalEntryDto.setDescription( entry.getDescription() );
-        journalEntryDto.setEntryDate( entry.getEntryDate() );
         journalEntryDto.setId( entry.getId() );
+        journalEntryDto.setEntryDate( entry.getEntryDate() );
+        journalEntryDto.setDescription( entry.getDescription() );
         journalEntryDto.setReferenceNumber( entry.getReferenceNumber() );
         journalEntryDto.setStatus( entry.getStatus() );
 
@@ -45,11 +45,11 @@ public class JournalEntryMapperImpl extends JournalEntryMapper {
         JournalEntry journalEntry = new JournalEntry();
 
         journalEntry.setId( dto.getId() );
-        journalEntry.setDescription( dto.getDescription() );
         journalEntry.setEntryDate( dto.getEntryDate() );
-        journalEntry.setLines( journalEntryLineDtoListToJournalEntryLineList( dto.getLines() ) );
+        journalEntry.setDescription( dto.getDescription() );
         journalEntry.setReferenceNumber( dto.getReferenceNumber() );
         journalEntry.setStatus( dto.getStatus() );
+        journalEntry.setLines( journalEntryLineDtoListToJournalEntryLineList( dto.getLines() ) );
 
         return journalEntry;
     }
@@ -64,10 +64,10 @@ public class JournalEntryMapperImpl extends JournalEntryMapper {
 
         journalEntryLineDto.setAccountId( lineAccountId( line ) );
         journalEntryLineDto.setAccountName( lineAccountName( line ) );
-        journalEntryLineDto.setCredit( line.getCredit() );
-        journalEntryLineDto.setDebit( line.getDebit() );
-        journalEntryLineDto.setDescription( line.getDescription() );
         journalEntryLineDto.setId( line.getId() );
+        journalEntryLineDto.setDebit( line.getDebit() );
+        journalEntryLineDto.setCredit( line.getCredit() );
+        journalEntryLineDto.setDescription( line.getDescription() );
 
         return journalEntryLineDto;
     }
@@ -81,10 +81,10 @@ public class JournalEntryMapperImpl extends JournalEntryMapper {
         JournalEntryLine journalEntryLine = new JournalEntryLine();
 
         journalEntryLine.setAccount( map( lineDto.getAccountId() ) );
-        journalEntryLine.setCredit( lineDto.getCredit() );
-        journalEntryLine.setDebit( lineDto.getDebit() );
-        journalEntryLine.setDescription( lineDto.getDescription() );
         journalEntryLine.setId( lineDto.getId() );
+        journalEntryLine.setDescription( lineDto.getDescription() );
+        journalEntryLine.setDebit( lineDto.getDebit() );
+        journalEntryLine.setCredit( lineDto.getCredit() );
 
         return journalEntryLine;
     }

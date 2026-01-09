@@ -15,8 +15,8 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
       <!-- Header -->
       <div class="flex items-end justify-between">
         <div>
-           <h2 class="text-3xl font-bold text-slate-900 leading-tight">Journal Entries</h2>
-           <p class="text-slate-500 mt-2 font-medium">Manage and review your manual ledger entries with precision.</p>
+           <h2 class="text-3xl font-bold text-slate-900 leading-tight">General Ledger</h2>
+           <p class="text-slate-500 mt-2 font-medium">Review all financial transactions and manage manual journal entries.</p>
         </div>
         <app-button icon="add" (onClick)="openCreateModal()">New Entry</app-button>
       </div>

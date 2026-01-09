@@ -1,1 +1,32 @@
-/* Basic styles */
+/* Premium Dialog Styles */
+.premium-dialog {
+  min-width: 500px;
+  max-width: 600px;
+}
+
+/* Ensure proper spacing */
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-5 > * + * {
+  margin-top: 1.25rem;
+}
+
+.space-y-8 > * + * {
+  margin-top: 2rem;
+}
+
+/* Checkbox styling */
+::ng-deep .mat-mdc-checkbox .mdc-checkbox__background {
+  border-radius: 6px !important;
+}
+
+::ng-deep .mat-mdc-checkbox.mat-primary .mdc-checkbox__background {
+  border-color: #94a3b8 !important;
+}
+
+::ng-deep .mat-mdc-checkbox.mat-primary.mat-mdc-checkbox-checked .mdc-checkbox__background {
+  background-color: var(--primary-600, #6366f1) !important;
+  border-color: var(--primary-600, #6366f1) !important;
+}

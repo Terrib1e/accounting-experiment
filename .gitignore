@@ -1,0 +1,37 @@
+# OS System Files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.iml
+.classpath
+.project
+.settings/
+
+# Java / Maven
+target/
+*.class
+.mvn/
+*.jar
+*.war
+.jqwik-database
+
+# Node / Angular (Frontend)
+node_modules/
+dist/
+.angular/
+coverage/
+
+# Logs
+*.log
+npm-debug.log
+yarn-error.log
+
+# Project Specific
+build_output.txt
+build_output_2.txt
+.kiro
+requirements.md

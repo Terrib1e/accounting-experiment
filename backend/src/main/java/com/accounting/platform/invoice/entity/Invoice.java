@@ -45,7 +45,7 @@ public class Invoice extends BaseEntity {
     @Column(name = "total_amount", nullable = false, precision = 19, scale = 4)
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
-    @Column(name = "amount_paid", nullable = false, precision = 19, scale = 4)
+    @Column(name = "amount_paid", precision = 19, scale = 4)
     private BigDecimal amountPaid = BigDecimal.ZERO;
 
 

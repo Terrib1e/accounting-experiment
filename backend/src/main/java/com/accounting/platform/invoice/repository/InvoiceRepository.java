@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Repository
-public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
+public interface InvoiceRepository extends JpaRepository<Invoice, UUID>, org.springframework.data.jpa.repository.JpaSpecificationExecutor<Invoice> {
     Page<Invoice> findByStatus(InvoiceStatus status, Pageable pageable);
 
     Page<Invoice> findByContactId(UUID contactId, Pageable pageable);

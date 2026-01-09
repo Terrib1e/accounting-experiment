@@ -1,5 +1,6 @@
 package com.accounting.platform.workflow.controller;
 
+import com.accounting.platform.common.dto.ApiResponse;
 import com.accounting.platform.workflow.dto.WorkflowDto;
 import com.accounting.platform.workflow.service.WorkflowService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,32 +24,32 @@ public class WorkflowController {
 
     @PostMapping
     @Operation(summary = "Create a new workflow")
-    public ResponseEntity<WorkflowDto> createWorkflow(@Valid @RequestBody WorkflowDto dto) {
-        return new ResponseEntity<>(workflowService.createWorkflow(dto), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<WorkflowDto>> createWorkflow(@Valid @RequestBody WorkflowDto dto) {
+        return new ResponseEntity<>(ApiResponse.success(workflowService.createWorkflow(dto)), HttpStatus.CREATED);
     }
 
     @GetMapping
     @Operation(summary = "Get all workflows")
-    public ResponseEntity<List<WorkflowDto>> getAllWorkflows() {
-        return ResponseEntity.ok(workflowService.getAllWorkflows());
+    public ResponseEntity<ApiResponse<List<WorkflowDto>>> getAllWorkflows() {
+        return ResponseEntity.ok(ApiResponse.success(workflowService.getAllWorkflows()));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get workflow by ID")
-    public ResponseEntity<WorkflowDto> getWorkflow(@PathVariable UUID id) {
-        return ResponseEntity.ok(workflowService.getWorkflow(id));
+    public ResponseEntity<ApiResponse<WorkflowDto>> getWorkflow(@PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.success(workflowService.getWorkflow(id)));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update workflow")
-    public ResponseEntity<WorkflowDto> updateWorkflow(@PathVariable UUID id, @Valid @RequestBody WorkflowDto dto) {
-        return ResponseEntity.ok(workflowService.updateWorkflow(id, dto));
+    public ResponseEntity<ApiResponse<WorkflowDto>> updateWorkflow(@PathVariable UUID id, @Valid @RequestBody WorkflowDto dto) {
+        return ResponseEntity.ok(ApiResponse.success(workflowService.updateWorkflow(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete workflow")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteWorkflow(@PathVariable UUID id) {
+    public ResponseEntity<ApiResponse<Void>> deleteWorkflow(@PathVariable UUID id) {
         workflowService.deleteWorkflow(id);
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

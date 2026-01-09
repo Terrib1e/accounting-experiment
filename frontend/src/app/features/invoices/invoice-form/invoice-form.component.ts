@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -34,292 +34,187 @@ import { TaxRateService } from '../../../core/services/tax-rate.service';
     MatNativeDateModule,
   ],
   template: `
-    <h2 mat-dialog-title>
-        {{ data ? 'Edit' : 'New' }} Invoice
-        <button mat-icon-button mat-dialog-close>
-          <mat-icon>close</mat-icon>
-        </button>
-    </h2>
-
-    <mat-dialog-content>
-      <form
-        [formGroup]="form"
-        id="invoice-form"
-        (ngSubmit)="onSubmit()"
-        class="flex flex-col gap-6 py-2"
-      >
-        <!-- Header section -->
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-6">
-            <mat-form-field
-              appearance="outline"
-              class="w-full"
-              subscriptSizing="dynamic"
-            >
-              <mat-label>Customer</mat-label>
-              <mat-select
-                formControlName="contactId"
-                placeholder="Select Customer"
-              >
-                <mat-option
-                  *ngFor="let contact of customers"
-                  [value]="contact.id"
-                >
-                  {{ contact.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <div class="col-span-6">
-            <mat-form-field
-              appearance="outline"
-              class="w-full"
-              subscriptSizing="dynamic"
-            >
-              <mat-label>Reference</mat-label>
-              <input
-                matInput
-                formControlName="reference"
-                placeholder="PO Number etc."
-              />
-            </mat-form-field>
-          </div>
-
-          <div class="col-span-4">
-            <mat-form-field
-              appearance="outline"
-              class="w-full"
-              subscriptSizing="dynamic"
-            >
-              <mat-label>Issue Date</mat-label>
-              <input
-                matInput
-                [matDatepicker]="issuePicker"
-                formControlName="issueDate"
-              />
-              <mat-datepicker-toggle
-                matIconSuffix
-                [for]="issuePicker"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #issuePicker></mat-datepicker>
-            </mat-form-field>
-          </div>
-
-          <div class="col-span-4">
-            <mat-form-field
-              appearance="outline"
-              class="w-full"
-              subscriptSizing="dynamic"
-            >
-              <mat-label>Due Date</mat-label>
-              <input
-                matInput
-                [matDatepicker]="duePicker"
-                formControlName="dueDate"
-              />
-              <mat-datepicker-toggle
-                matIconSuffix
-                [for]="duePicker"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #duePicker></mat-datepicker>
-            </mat-form-field>
-          </div>
-
-          <div class="col-span-4">
-            <mat-form-field
-              appearance="outline"
-              class="w-full"
-              subscriptSizing="dynamic"
-            >
-              <mat-label>Currency</mat-label>
-              <input matInput formControlName="currency" />
-            </mat-form-field>
-          </div>
+    <div class="premium-dialog flex flex-col h-full bg-white text-slate-900">
+        <!-- Header -->
+        <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 z-50 bg-white">
+            <div class="flex items-center gap-4">
+                <div class="w-11 h-11 bg-indigo-50 rounded-xl flex items-center justify-center border border-indigo-100/30">
+                    <mat-icon class="text-indigo-600 scale-90">{{ data ? 'edit_document' : 'receipt' }}</mat-icon>
+                </div>
+                <div class="flex flex-col">
+                    <h2 class="text-slate-900 text-lg font-bold tracking-tight leading-none m-0">{{ data ? 'Edit' : 'Draft' }} Invoice</h2>
+                    <span class="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest flex items-center gap-1.5 leading-none">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Accounts Receivable
+                    </span>
+                </div>
+            </div>
+            <button mat-icon-button mat-dialog-close class="hover:bg-slate-50 transition-all rounded-xl text-slate-400">
+                <mat-icon>close</mat-icon>
+            </button>
         </div>
 
-        <!-- Lines Table -->
-        <div class="border border-slate-200 rounded-lg overflow-hidden">
-          <div
-            class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between"
-          >
-            <h3 class="font-semibold text-slate-700 m-0">Line Items</h3>
-          </div>
+    <mat-dialog-content class="!p-0 !m-0 bg-slate-50/30">
+      <form [formGroup]="form" id="invoice-form" (ngSubmit)="onSubmit()" class="flex flex-col gap-10 p-8">
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-              <thead
-                class="bg-white border-b border-slate-200 text-slate-500 font-medium"
-              >
-                <tr>
-                  <th class="px-4 py-2">Description</th>
-                  <th class="px-4 py-2 w-1/4">Revenue Account</th>
-                  <th class="px-4 py-2 w-32">Tax Rate</th>
-                  <th class="px-4 py-2 w-24 text-right">Qty</th>
-                  <th class="px-4 py-2 w-32 text-right">Price</th>
-                  <th class="px-4 py-2 w-32 text-right">Amount</th>
-                  <th class="px-4 py-2 w-10"></th>
-                </tr>
-              </thead>
-              <tbody formArrayName="lines" class="divide-y divide-slate-100">
-                <tr
-                  *ngFor="let line of lines.controls; let i = index"
-                  [formGroupName]="i"
-                  class="valign-top group hover:bg-slate-50 transition-colors"
-                >
-                  <td class="px-4 py-2">
-                    <mat-form-field
-                      appearance="outline"
-                      class="w-full dense-field"
-                      subscriptSizing="dynamic"
-                    >
-                      <input
-                        matInput
-                        formControlName="description"
-                        placeholder="Item description"
-                      />
+        <!-- Metadata Section -->
+        <div class="space-y-5">
+            <div class="flex items-center gap-2 px-1">
+                <div class="w-1 h-4 bg-indigo-500 rounded-full"></div>
+                <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none">Invoice Identity</h3>
+            </div>
+            <div class="grid grid-cols-12 gap-5 px-1">
+                <div class="col-span-12 md:col-span-8">
+                    <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                        <mat-label>Customer / Client</mat-label>
+                        <select matNativeControl formControlName="contactId" required>
+                            <option value="" disabled selected>Select Customer</option>
+                            <option *ngFor="let contact of customers" [value]="contact.id">
+                                {{ contact.name }}
+                            </option>
+                        </select>
                     </mat-form-field>
-                  </td>
-                  <td class="px-4 py-2">
-                    <mat-form-field
-                      appearance="outline"
-                      class="w-full dense-field"
-                      subscriptSizing="dynamic"
-                    >
-                      <mat-select
-                        formControlName="revenueAccountId"
-                        placeholder="Select Account"
-                      >
-                        <mat-option
-                          *ngFor="let acc of revenueAccounts"
-                          [value]="acc.id"
-                        >
-                          <span class="font-mono text-xs text-slate-500 mr-2">{{
-                            acc.code
-                          }}</span>
-                          {{ acc.name }}
-                        </mat-option>
-                      </mat-select>
+                </div>
+
+                <div class="col-span-12 md:col-span-4">
+                    <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                        <mat-label>Reference #</mat-label>
+                        <input matInput formControlName="reference" placeholder="PO Number etc.">
                     </mat-form-field>
-                  </td>
-                  <td class="px-4 py-2">
-                    <mat-form-field
-                      appearance="outline"
-                      class="w-full dense-field text-right-input"
-                      subscriptSizing="dynamic"
-                    >
-                      <input
-                        matInput
-                        type="number"
-                        formControlName="quantity"
-                        (input)="updateAmount(i)"
-                        class="text-right"
-                      />
+                </div>
+
+                <div class="col-span-12 md:col-span-4">
+                    <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                        <mat-label>Issue Date</mat-label>
+                        <input matInput [matDatepicker]="issuePicker" formControlName="issueDate">
+                        <mat-datepicker-toggle matIconSuffix [for]="issuePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #issuePicker></mat-datepicker>
                     </mat-form-field>
-                  </td>
-                  <td class="px-4 py-2">
-                    <mat-form-field
-                      appearance="outline"
-                      class="w-full dense-field text-right-input"
-                      subscriptSizing="dynamic"
-                    >
-                      <input
-                        matInput
-                        type="number"
-                        formControlName="unitPrice"
-                        (input)="updateAmount(i)"
-                        class="text-right"
-                      />
+                </div>
+
+                <div class="col-span-12 md:col-span-4">
+                    <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                        <mat-label>Due Date</mat-label>
+                        <input matInput [matDatepicker]="duePicker" formControlName="dueDate">
+                        <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #duePicker></mat-datepicker>
                     </mat-form-field>
-                  </td>
-                  <td
-                    class="px-4 py-2 text-right font-medium text-slate-900 align-middle"
-                  >
-                    {{ line.get('amount')?.value | currency }}
-                  </td>
-                  <td class="px-4 py-2 text-center align-middle">
-                    <button
-                      mat-icon-button
-                      color="warn"
-                      type="button"
-                      (click)="removeLine(i)"
-                      class="opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <mat-icon>delete_outline</mat-icon>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot
-                class="bg-slate-50 font-semibold text-slate-900 border-t border-slate-200"
-              >
-                <tr>
-                  <td colspan="2" class="px-4 py-3">
-                    <button
-                      mat-button
-                      color="primary"
-                      type="button"
-                      (click)="addLine()"
-                    >
-                      <mat-icon>add</mat-icon> Add Line
-                    </button>
-                  </td>
-                  <td colspan="2" class="px-4 py-3 text-right text-slate-500">
-                    Total:
-                  </td>
-                  <td class="px-4 py-3 text-right text-lg">
-                    {{ totalAmount | currency }}
-                  </td>
-                  <td></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+                </div>
+
+                <div class="col-span-12 md:col-span-4">
+                    <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                        <mat-label>Currency</mat-label>
+                        <select matNativeControl formControlName="currency">
+                            <option value="USD">USD - US Dollar</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="GBP">GBP - British Pound</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+            </div>
         </div>
 
-        <mat-form-field
-          appearance="outline"
-          class="w-full"
-          subscriptSizing="dynamic"
-        >
-          <mat-label>Notes</mat-label>
-          <textarea
-            matInput
-            formControlName="notes"
-            rows="2"
-            placeholder="Add any relevant notes or terms..."
-          ></textarea>
-        </mat-form-field>
+        <!-- Items Table Section -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between px-1">
+                <div class="flex items-center gap-2">
+                    <div class="w-1 h-4 bg-indigo-500 rounded-full"></div>
+                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none">Pricing & Items</label>
+                </div>
+                <button mat-stroked-button type="button" (click)="addLine()" class="!rounded-xl !border-slate-200 !text-slate-600 hover:!bg-slate-50 !font-bold !text-[11px] !py-1 h-8">
+                    <mat-icon class="!text-sm !w-4 !h-4 !min-w-[16px] !min-h-[16px] !m-0">add</mat-icon>
+                    <span class="ml-1 uppercase">Add Item</span>
+                </button>
+            </div>
+
+            <div class="overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm mx-1">
+                <table class="w-full text-sm text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Description</th>
+                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-1/4">Revenue Account</th>
+                            <th class="px-3 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-20 text-right">Qty</th>
+                            <th class="px-3 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-24 text-right">Price</th>
+                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-32 text-right">Amount</th>
+                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-10 text-center"></th>
+                        </tr>
+                    </thead>
+                    <tbody formArrayName="lines" class="divide-y divide-slate-50">
+                        <tr *ngFor="let line of lines.controls; let i = index" [formGroupName]="i" class="group hover:bg-slate-50/40 transition-colors">
+                            <td class="px-4 py-3">
+                                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                                    <input matInput formControlName="description" placeholder="Product or service..." />
+                                </mat-form-field>
+                            </td>
+                            <td class="px-4 py-3">
+                                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                                    <select matNativeControl formControlName="revenueAccountId" required>
+                                        <option value="" disabled>Select Account</option>
+                                        <option *ngFor="let acc of revenueAccounts" [value]="acc.id">
+                                            {{ acc.code }} - {{ acc.name }}
+                                        </option>
+                                    </select>
+                                </mat-form-field>
+                            </td>
+                            <td class="px-2 py-3">
+                                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                                    <input matInput type="number" formControlName="quantity" class="text-right font-medium" />
+                                </mat-form-field>
+                            </td>
+                            <td class="px-2 py-3">
+                                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                                    <input matInput type="number" formControlName="unitPrice" class="text-right font-medium" />
+                                </mat-form-field>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <span class="font-bold text-slate-800">
+                                    {{ (line.get('quantity')?.value * line.get('unitPrice')?.value) || 0 | currency:form.get('currency')?.value }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <button mat-icon-button type="button" (click)="removeLine(i)"
+                                        class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all rounded-lg">
+                                    <mat-icon class="!text-lg">delete_outline</mat-icon>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="bg-slate-900 text-white">
+                        <tr>
+                            <td colspan="4" class="px-8 py-6">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Billing Summary</span>
+                                    <span class="text-xs text-slate-500 mt-1">{{lines.length}} line items included</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold font-mono">Total Receivable</span>
+                                    <span class="text-2xl font-bold tracking-tight text-white">{{ totalAmount | currency:form.get('currency')?.value }}</span>
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
       </form>
     </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
-          <button mat-button mat-dialog-close type="button">Cancel</button>
-          <button
-            mat-flat-button
-            color="primary"
-            type="submit"
-            [disabled]="form.invalid"
-            (click)="onSubmit()"
-          >
-            Save Invoice
-          </button>
+    <mat-dialog-actions class="!px-8 !py-6 bg-white border-t border-slate-100">
+        <button mat-button mat-dialog-close class="!rounded-xl !px-6 h-12 !text-slate-500 hover:bg-slate-50 font-bold transition-all">Discard</button>
+        <button mat-flat-button color="primary"
+                (click)="onSubmit()"
+                [disabled]="form.invalid"
+                class="!min-w-[200px] !bg-indigo-600 !text-white !rounded-xl !h-12 shadow-lg shadow-indigo-500/10 hover:shadow-xl transition-all font-bold">
+            <div class="flex items-center justify-center gap-2">
+                <mat-icon class="!text-lg">{{ data ? 'save' : 'send' }}</mat-icon>
+                <span class="tracking-tight">{{ data ? 'Update' : 'Issue' }} Invoice</span>
+            </div>
+        </button>
     </mat-dialog-actions>
-
-    <style>
-      .dense-field .mat-mdc-form-field-wrapper {
-        padding-bottom: 0;
-      }
-      .dense-field .mat-mdc-form-field-infix {
-        padding-top: 6px;
-        padding-bottom: 6px;
-        min-height: 36px;
-      }
-      .text-right-input input {
-        text-align: right;
-      }
-    </style>
-  `,
+    </div>
+`  ,
 })
 export class InvoiceFormComponent implements OnInit {
   form: FormGroup;
@@ -333,6 +228,7 @@ export class InvoiceFormComponent implements OnInit {
     private contactService: ContactService,
     private accountService: AccountService,
     private taxRateService: TaxRateService,
+    private cdr: ChangeDetectorRef,
     private dialogRef: MatDialogRef<InvoiceFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Invoice | null
   ) {
@@ -349,14 +245,27 @@ export class InvoiceFormComponent implements OnInit {
 
   ngOnInit(): void {
     // Load customers
-    this.contactService.getContacts().subscribe((res) => {
-      // Filter for CUSTOMER type? simpler to show all for now or filter in memory
-      this.customers = res.data.content;
+    this.contactService.getContacts().subscribe({
+      next: (res) => {
+        console.log('InvoiceForm: Contacts loaded:', res);
+        if (res && res.data && res.data.content) {
+          this.customers = res.data.content.filter(c => c.type === 'CUSTOMER');
+          console.log('InvoiceForm: Filtered customers:', this.customers);
+          this.cdr.detectChanges();
+        } else {
+          console.warn('InvoiceForm: No contacts data found');
+          this.customers = [];
+        }
+      },
+      error: (err) => {
+        console.error('InvoiceForm: Error loading contacts:', err);
+      }
     });
 
     // Load revenue accounts
     this.accountService.getAccounts().subscribe((res) => {
       this.revenueAccounts = res.data.filter((a) => a.type === 'REVENUE');
+      this.cdr.detectChanges();
     });
 
     // Load tax rates

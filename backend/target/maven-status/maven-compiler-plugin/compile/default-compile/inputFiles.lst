@@ -7,6 +7,7 @@ C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\mai
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\invoice\entity\Invoice.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\bank\repository\BankAccountRepository.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\workflow\repository\TaskRepository.java
+C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\report\dto\AgingReportDto.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\journal\controller\JournalEntryController.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\security\service\AuthService.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\common\exception\GlobalExceptionHandler.java
@@ -23,6 +24,7 @@ C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\mai
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\security\entity\User.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\audit\service\AuditService.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\bank\repository\BankTransactionRepository.java
+C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\expense\repository\ExpenseSpecifications.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\security\repository\UserRepository.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\workflow\mapper\JobMapper.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\dashboard\dto\ActivityItemDto.java
@@ -44,6 +46,7 @@ C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\mai
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\dashboard\dto\DashboardStatsDto.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\journal\service\JournalEntryService.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\config\ChartOfAccountsSeeder.java
+C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\invoice\repository\InvoiceSpecifications.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\settings\service\FiscalPeriodService.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\audit\repository\AuditLogRepository.java
 C:\Users\elija\OneDrive\Documents\Projects\accounting_experiment\backend\src\main\java\com\accounting\platform\expense\entity\ExpenseStatus.java

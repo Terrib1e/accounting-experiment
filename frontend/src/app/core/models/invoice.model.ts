@@ -5,7 +5,7 @@ export interface Invoice {
   issueDate: string;
   dueDate: string;
   totalAmount: number;
-  status: 'DRAFT' | 'APPROVED' | 'PAID' | 'VOID';
+  status: 'DRAFT' | 'SENT' | 'APPROVED' | 'PAID' | 'VOID';
   currency: string;
   reference?: string;
   notes?: string;

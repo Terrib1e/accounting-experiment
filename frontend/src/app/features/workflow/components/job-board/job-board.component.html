@@ -14,6 +14,11 @@
         </mat-select>
       </mat-form-field>
 
+      <button mat-stroked-button color="primary" routerLink="/workflows">
+        <mat-icon>settings</mat-icon>
+        Manage Workflows
+      </button>
+
       <button mat-raised-button color="primary" (click)="openCreateJobDialog()">
         <mat-icon>add</mat-icon>
         New Job
@@ -41,6 +46,7 @@
           cdkDropList
           [id]="stage.id"
           [cdkDropListData]="columns[stage.id]"
+          [cdkDropListConnectedTo]="connectedDropLists"
           class="flex-1 overflow-y-auto space-y-3 min-h-[100px]"
           (cdkDropListDropped)="drop($event)">
 

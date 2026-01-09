@@ -10,9 +10,11 @@ import com.accounting.platform.expense.entity.Expense;
 import com.accounting.platform.expense.entity.ExpenseLine;
 import com.accounting.platform.expense.entity.ExpenseStatus;
 import com.accounting.platform.expense.repository.ExpenseRepository;
+import com.accounting.platform.expense.repository.ExpenseSpecifications;
 import com.accounting.platform.journal.entity.JournalEntry;
 import com.accounting.platform.journal.entity.JournalEntryLine;
 import com.accounting.platform.journal.service.JournalEntryService;
+import com.accounting.platform.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Collection;
 import java.util.UUID;
 
 @Service
@@ -31,10 +35,26 @@ public class ExpenseService {
     private final AccountRepository accountRepository;
     private final ContactRepository contactRepository;
     private final AuditService auditService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public Page<Expense> getAllExpenses(Pageable pageable) {
         Page<Expense> expenses = expenseRepository.findAll(pageable);
+        expenses.forEach(expense -> expense.getLines().size()); // Initialize lazy collection
+        return expenses;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Expense> getAllExpenses(
+            Pageable pageable,
+            String search,
+            Collection<ExpenseStatus> statuses,
+            java.util.UUID vendorId,
+            LocalDate startDate,
+            LocalDate endDate) {
+
+        var spec = ExpenseSpecifications.buildSpec(search, statuses, vendorId, startDate, endDate);
+        Page<Expense> expenses = expenseRepository.findAll(spec, pageable);
         expenses.forEach(expense -> expense.getLines().size()); // Initialize lazy collection
         return expenses;
     }
@@ -153,6 +173,7 @@ public class ExpenseService {
         }
 
         JournalEntry createdEntry = journalEntryService.createEntry(entry);
+        journalEntryService.approve(createdEntry.getId());
         journalEntryService.postEntry(createdEntry.getId());
 
         // 3. Update Expense Status
@@ -160,6 +181,8 @@ public class ExpenseService {
         Expense saved = expenseRepository.save(expense);
 
         auditService.logAction("APPROVE_EXPENSE", "Expense", id, "Created Journal Entry " + createdEntry.getReferenceNumber());
+
+        notificationService.notifyExpenseApproved(expense.getReferenceNumber(), id);
 
         return saved;
     }
@@ -208,6 +231,7 @@ public class ExpenseService {
         entry.addLine(creditBank);
 
         JournalEntry createdEntry = journalEntryService.createEntry(entry);
+        journalEntryService.approve(createdEntry.getId());
         journalEntryService.postEntry(createdEntry.getId());
 
         // Update Expense
@@ -215,6 +239,8 @@ public class ExpenseService {
         Expense saved = expenseRepository.save(expense);
 
         auditService.logAction("PAY_EXPENSE", "Expense", id, "Registered Payment " + createdEntry.getReferenceNumber());
+
+        notificationService.notifyExpensePaid(expense.getReferenceNumber(), id);
 
         return saved;
     }

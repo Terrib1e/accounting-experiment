@@ -1,7 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Expense } from '../models/expense.model';
+
+export interface ExpenseFilters {
+  search?: string;
+  status?: string[];
+  vendorId?: string;
+  startDate?: string;
+  endDate?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +19,20 @@ export class ExpenseService {
 
   constructor(private http: HttpClient) {}
 
-  getExpenses(): Observable<{data: { content: Expense[] }}> {
-    return this.http.get<{data: { content: Expense[] }}>(this.apiUrl);
+  getExpenses(filters?: ExpenseFilters): Observable<{data: { content: Expense[] }}> {
+    let params = new HttpParams();
+
+    if (filters) {
+      if (filters.search) params = params.set('search', filters.search);
+      if (filters.status?.length) {
+        filters.status.forEach(s => params = params.append('status', s));
+      }
+      if (filters.vendorId) params = params.set('vendorId', filters.vendorId);
+      if (filters.startDate) params = params.set('startDate', filters.startDate);
+      if (filters.endDate) params = params.set('endDate', filters.endDate);
+    }
+
+    return this.http.get<{data: { content: Expense[] }}>(this.apiUrl, { params });
   }
 
   getExpense(id: string): Observable<{data: Expense}> {
