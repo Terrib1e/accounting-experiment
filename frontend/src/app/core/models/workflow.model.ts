@@ -2,8 +2,8 @@ export interface WorkflowStage {
   id: string;
   name: string;
   orderIndex: number;
-  isInitial: boolean;
-  isFinal: boolean;
+  initial: boolean;
+  finalStage: boolean;
 }
 
 export interface Workflow {

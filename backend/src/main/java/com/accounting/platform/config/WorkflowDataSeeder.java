@@ -93,7 +93,7 @@ public class WorkflowDataSeeder {
         s.setName(name);
         s.setOrderIndex(order);
         s.setInitial(initial);
-        s.setFinal(isFinal);
+        s.setFinalStage(isFinal);
         return s;
     }
 

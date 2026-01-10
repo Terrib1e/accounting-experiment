@@ -75,7 +75,7 @@ public class WorkflowService {
                     existingStage.setName(stageDto.getName());
                     existingStage.setOrderIndex(stageDto.getOrderIndex());
                     existingStage.setInitial(stageDto.isInitial());
-                    existingStage.setFinal(stageDto.isFinal());
+                    existingStage.setFinalStage(stageDto.isFinalStage());
                     updatedStageIds.add(stageDto.getId());
                 } else {
                     // Add new stage

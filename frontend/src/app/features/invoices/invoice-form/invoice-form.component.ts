@@ -167,7 +167,7 @@ import { TaxRateService } from '../../../core/services/tax-rate.service';
                             </td>
                             <td class="px-4 py-3 text-right">
                                 <span class="font-bold text-slate-800">
-                                    {{ (line.get('quantity')?.value * line.get('unitPrice')?.value) || 0 | currency:form.get('currency')?.value }}
+                                    {{ (line.get('quantity')?.value * line.get('unitPrice')?.value) || 0 | currency:(form.get('currency')?.value || 'USD') }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 text-center">
@@ -189,7 +189,7 @@ import { TaxRateService } from '../../../core/services/tax-rate.service';
                             <td class="px-8 py-6 text-right">
                                 <div class="flex flex-col items-end">
                                     <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold font-mono">Total Receivable</span>
-                                    <span class="text-2xl font-bold tracking-tight text-white">{{ totalAmount | currency:form.get('currency')?.value }}</span>
+                                    <span class="text-2xl font-bold tracking-tight text-white">{{ totalAmount | currency:(form.get('currency')?.value || 'USD') }}</span>
                                 </div>
                             </td>
                             <td></td>
@@ -336,14 +336,18 @@ export class InvoiceFormComponent implements OnInit {
     if (this.form.valid) {
       const value = this.form.getRawValue(); // Get disabled amount values too
 
+      const { contactId, ...rest } = value;
       const payload = {
-        ...value,
-        contact: { id: value.contactId }, // Backend expects contact object or contactId depending on DTO
-        lines: value.lines.map((l: any) => ({
-          ...l,
-          revenueAccount: { id: l.revenueAccountId },
-          taxRate: l.taxRateId ? { id: l.taxRateId } : null,
-        })),
+        ...rest,
+        contact: { id: contactId },
+        lines: value.lines.map((l: any) => {
+           const { revenueAccountId, taxRateId, ...lineRest } = l;
+           return {
+            ...lineRest,
+            revenueAccount: { id: revenueAccountId },
+            taxRate: taxRateId ? { id: taxRateId } : null,
+          };
+        }),
       };
 
       this.dialogRef.close(payload);

@@ -172,7 +172,7 @@ import { Account } from '../../../core/models/account.model';
                                     <td class="px-8 py-6 text-right">
                                         <div class="flex flex-col items-end">
                                             <span class="text-[10px] text-primary-400 uppercase tracking-widest font-bold font-mono">Total Transaction</span>
-                                            <span class="text-2xl font-bold tracking-tight text-white">{{ totalAmount | currency:form.get('currency')?.value }}</span>
+                                            <span class="text-2xl font-bold tracking-tight text-white">{{ totalAmount | currency:(form.get('currency')?.value || 'USD') }}</span>
                                         </div>
                                     </td>
                                     <td></td>

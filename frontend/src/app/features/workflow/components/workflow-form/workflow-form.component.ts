@@ -68,8 +68,8 @@ export class WorkflowFormComponent implements OnInit {
       id: [stage?.id || null],
       name: [stage?.name || '', Validators.required],
       orderIndex: [stage?.orderIndex || 0],
-      isInitial: [stage?.isInitial || false],
-      isFinal: [stage?.isFinal || false]
+      initial: [stage?.initial || false],
+      finalStage: [stage?.finalStage || false]
     });
   }
 

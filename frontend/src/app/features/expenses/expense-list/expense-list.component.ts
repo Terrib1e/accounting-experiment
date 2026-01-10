@@ -80,7 +80,7 @@ import { MatIconModule } from '@angular/material/icon';
                 {{ expense.referenceNumber }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-slate-900">
-                {{ expense.totalAmount | currency:expense.currency }}
+                {{ (expense.totalAmount || 0) | currency:(expense.currency || 'USD') }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                  <span [ngClass]="{

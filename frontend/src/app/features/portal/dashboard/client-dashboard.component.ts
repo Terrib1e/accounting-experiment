@@ -150,71 +150,86 @@ import { StatCardComponent } from '../../../shared/components/stat-card/stat-car
           <!-- Info Cards -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Outstanding Balance -->
-            <div class="premium-card p-6 bg-white">
-              <div class="flex items-start justify-between mb-4">
+            <div class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 hover:shadow-stat-glow-warning hover:border-amber-200/50 transition-all duration-300 hover:-translate-y-1">
+              <!-- Shimmer Effect -->
+              <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none z-20"></div>
+              <!-- Gradient Accent Line -->
+              <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600"></div>
+
+              <div class="flex items-start justify-between mb-4 relative z-10">
                 <div>
                   <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Outstanding</p>
-                  <p class="text-3xl font-bold text-slate-900 mt-1">{{ dashboard?.totalOutstandingAmount | currency }}</p>
+                  <p class="text-3xl font-extrabold text-slate-900 mt-2 tracking-tight">{{ dashboard?.totalOutstandingAmount | currency }}</p>
                 </div>
-                <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                   <span class="material-icons text-white">account_balance_wallet</span>
                 </div>
               </div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs text-slate-500">{{ dashboard?.outstandingInvoices || 0 }} invoice(s)</span>
-                <a routerLink="/portal/invoices" class="text-xs font-semibold text-primary-600 hover:text-primary-700 flex items-center">
-                  View Details <span class="material-icons text-sm ml-1">arrow_forward</span>
+              <div class="flex items-center justify-between relative z-10">
+                <span class="text-xs text-slate-500 font-medium">{{ dashboard?.outstandingInvoices || 0 }} invoice(s)</span>
+                <a routerLink="/portal/invoices" class="text-xs font-bold text-primary-600 hover:text-primary-700 flex items-center group/link">
+                  View Details <span class="material-icons text-sm ml-1 group-hover/link:translate-x-1 transition-transform">arrow_forward</span>
                 </a>
               </div>
             </div>
 
             <!-- Active Projects -->
-            <div class="premium-card p-6 bg-white">
-              <div class="flex items-start justify-between mb-4">
+            <div class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 hover:shadow-stat-glow-success hover:border-accent-200/50 transition-all duration-300 hover:-translate-y-1">
+              <!-- Shimmer Effect -->
+              <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none z-20"></div>
+              <!-- Gradient Accent Line -->
+              <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent-400 via-accent-500 to-accent-600"></div>
+
+              <div class="flex items-start justify-between mb-4 relative z-10">
                 <div>
                   <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Projects</p>
-                  <p class="text-3xl font-bold text-slate-900 mt-1">{{ dashboard?.activeJobs || 0 }}</p>
+                  <p class="text-3xl font-extrabold text-slate-900 mt-2 tracking-tight">{{ dashboard?.activeJobs || 0 }}</p>
                 </div>
-                <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center shadow-lg shadow-accent-500/20">
+                <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center shadow-lg shadow-accent-500/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                   <span class="material-icons text-white">engineering</span>
                 </div>
               </div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs text-slate-500">In progress</span>
-                <a routerLink="/portal/jobs" class="text-xs font-semibold text-primary-600 hover:text-primary-700 flex items-center">
-                  Track Progress <span class="material-icons text-sm ml-1">arrow_forward</span>
+              <div class="flex items-center justify-between relative z-10">
+                <span class="text-xs text-slate-500 font-medium">In progress</span>
+                <a routerLink="/portal/jobs" class="text-xs font-bold text-primary-600 hover:text-primary-700 flex items-center group/link">
+                  Track Progress <span class="material-icons text-sm ml-1 group-hover/link:translate-x-1 transition-transform">arrow_forward</span>
                 </a>
               </div>
             </div>
           </div>
 
           <!-- Recent Updates Section -->
-          <div class="premium-card overflow-hidden bg-white">
-            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div class="rounded-2xl border border-slate-200/60 bg-white overflow-hidden shadow-fintech-card">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50/50 to-transparent">
               <h4 class="text-sm font-bold text-slate-800">Recent Updates</h4>
               <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Last 30 days</span>
             </div>
-            <div class="divide-y divide-slate-50">
-              <!-- Placeholder items -->
-              <div class="flex items-center p-5 hover:bg-slate-50/50 transition-colors">
-                <div class="h-10 w-10 rounded-xl bg-accent-50 border border-accent-100 flex items-center justify-center mr-4">
-                  <span class="material-icons text-accent-600 text-lg">check_circle</span>
+            <div class="divide-y divide-slate-100/80">
+              <!-- Placeholder items with enhanced styling -->
+              <div class="group flex items-center p-5 hover:bg-gradient-to-r hover:from-slate-50/80 hover:to-transparent transition-all duration-300 relative cursor-pointer">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-accent-400 to-accent-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-r"></div>
+                <div class="relative mr-4">
+                  <div class="h-11 w-11 rounded-xl bg-accent-50 border border-accent-100 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <span class="material-icons text-accent-600 text-lg">check_circle</span>
+                  </div>
+                  <div class="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-accent-400 border-2 border-white animate-pulse-glow"></div>
                 </div>
                 <div class="flex-1">
-                  <p class="text-sm font-semibold text-slate-800">Account Verified</p>
+                  <p class="text-sm font-bold text-slate-800 group-hover:text-primary-600 transition-colors">Account Verified</p>
                   <p class="text-xs text-slate-500">Your account is in good standing</p>
                 </div>
-                <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-full">Today</span>
+                <span class="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full group-hover:bg-primary-50 group-hover:text-primary-600 transition-all">Today</span>
               </div>
-              <div class="flex items-center p-5 hover:bg-slate-50/50 transition-colors">
-                <div class="h-10 w-10 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center mr-4">
+              <div class="group flex items-center p-5 hover:bg-gradient-to-r hover:from-slate-50/80 hover:to-transparent transition-all duration-300 relative cursor-pointer">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary-400 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-r"></div>
+                <div class="h-11 w-11 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center mr-4 group-hover:scale-105 transition-transform">
                   <span class="material-icons text-primary-600 text-lg">update</span>
                 </div>
                 <div class="flex-1">
-                  <p class="text-sm font-semibold text-slate-800">Portal Access Granted</p>
+                  <p class="text-sm font-bold text-slate-800 group-hover:text-primary-600 transition-colors">Portal Access Granted</p>
                   <p class="text-xs text-slate-500">Welcome to your client portal</p>
                 </div>
-                <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-full">Recent</span>
+                <span class="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full group-hover:bg-primary-50 group-hover:text-primary-600 transition-all">Recent</span>
               </div>
             </div>
           </div>

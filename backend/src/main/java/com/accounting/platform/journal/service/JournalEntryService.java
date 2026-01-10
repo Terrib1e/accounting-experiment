@@ -109,6 +109,18 @@ public class JournalEntryService {
             throw new IllegalStateException("Entry date " + entry.getEntryDate() + " is not in an open fiscal period");
         }
 
+        // Validate each line has either debit OR credit, but not both and not neither
+        entry.getLines().forEach(line -> {
+            boolean hasDebit = line.getDebit().compareTo(BigDecimal.ZERO) > 0;
+            boolean hasCredit = line.getCredit().compareTo(BigDecimal.ZERO) > 0;
+            if (hasDebit && hasCredit) {
+                throw new IllegalStateException("Line for account " + line.getAccount().getCode() + " cannot have both debit and credit values");
+            }
+            if (!hasDebit && !hasCredit) {
+                throw new IllegalStateException("Line for account " + line.getAccount().getCode() + " must have either a debit or credit value");
+            }
+        });
+
         BigDecimal totalDebit = entry.getLines().stream()
                 .map(JournalEntryLine::getDebit)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -60,7 +60,7 @@ public class PortalController {
 
         List<Job> jobs = jobRepository.findByContactId(contact.getId());
         long activeJobs = jobs.stream()
-                .filter(j -> j.getCurrentStage() != null && !j.getCurrentStage().isFinal())
+                .filter(j -> j.getCurrentStage() != null && !j.getCurrentStage().isFinalStage())
                 .count();
 
         // Placeholder for documents until Document module is ready

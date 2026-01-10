@@ -26,9 +26,9 @@ public class WorkflowStage extends BaseEntity {
     @Column(nullable = false)
     private Integer orderIndex; // For ordering columns in Kanban board
 
-    @Column(nullable = false)
-    private boolean isInitial; // Default stage when job starts
+    @Column(name = "is_initial", nullable = false)
+    private boolean initial; // Default stage when job starts
 
-    @Column(nullable = false)
-    private boolean isFinal; // Job is considered complete
+    @Column(name = "is_final", nullable = false)
+    private boolean finalStage; // Job is considered complete
 }

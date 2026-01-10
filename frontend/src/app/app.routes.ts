@@ -29,6 +29,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'time-tracking',
+        loadComponent: () =>
+          import(
+            './features/time-tracking/components/time-entry-list/time-entry-list.component'
+          ).then((m) => m.TimeEntryListComponent),
+      },
+      {
         path: 'workflow',
         loadComponent: () =>
           import(

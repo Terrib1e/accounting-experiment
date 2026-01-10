@@ -36,6 +36,14 @@ import { AuthService } from '../../auth/auth.service';
           <span class="nav-text">Dashboard</span>
         </a>
 
+        <a routerLink="/time-tracking" routerLinkActive="nav-active"
+           class="nav-item group">
+          <div class="nav-icon-container">
+            <span class="material-icons nav-icon">timer</span>
+          </div>
+          <span class="nav-text">Time Tracking</span>
+        </a>
+
         <div class="nav-section-label">Accounting</div>
         <a routerLink="/accounts" routerLinkActive="nav-active"
            class="nav-item group">

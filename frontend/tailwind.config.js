@@ -58,6 +58,11 @@ module.exports = {
         'card': '0 2px 4px 0 rgba(0,0,0,0.02), 0 1px 0 0 rgba(0,0,0,0.01)',
         'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
         'primary-glow': '0 0 20px rgba(99, 102, 241, 0.25)',
+        'stat-glow-success': '0 0 30px rgba(16, 185, 162, 0.15), 0 8px 24px -4px rgba(16, 185, 162, 0.2)',
+        'stat-glow-warning': '0 0 30px rgba(245, 158, 11, 0.15), 0 8px 24px -4px rgba(245, 158, 11, 0.2)',
+        'stat-glow-danger': '0 0 30px rgba(239, 68, 68, 0.15), 0 8px 24px -4px rgba(239, 68, 68, 0.2)',
+        'stat-glow-info': '0 0 30px rgba(99, 102, 241, 0.15), 0 8px 24px -4px rgba(99, 102, 241, 0.2)',
+        'fintech-card': '0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.04), 0 24px 48px rgba(0,0,0,0.06)',
       },
       backdropBlur: {
         'glass': '12px',
@@ -66,6 +71,10 @@ module.exports = {
         'fade-in': 'fadeIn 0.4s ease-out',
         'slide-up': 'slideUp 0.4s ease-out',
         'scale-in': 'scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        'shimmer': 'shimmer 2s linear infinite',
+        'sparkline-grow': 'sparklineGrow 1s ease-out forwards',
+        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+        'count-up': 'countUp 0.8s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -79,6 +88,22 @@ module.exports = {
         scaleIn: {
           '0%': { opacity: '0', transform: 'scale(0.95)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        sparklineGrow: {
+          '0%': { transform: 'scaleY(0)', opacity: '0' },
+          '100%': { transform: 'scaleY(1)', opacity: '1' },
+        },
+        pulseGlow: {
+          '0%, 100%': { opacity: '0.6' },
+          '50%': { opacity: '1' },
+        },
+        countUp: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
       backgroundImage: {

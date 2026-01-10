@@ -64,4 +64,11 @@ public class Expense extends BaseEntity {
                 .map(ExpenseLine::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    public void setVendorId(UUID vendorId) {
+        if (vendorId != null) {
+            this.vendor = new Contact();
+            this.vendor.setId(vendorId);
+        }
+    }
 }

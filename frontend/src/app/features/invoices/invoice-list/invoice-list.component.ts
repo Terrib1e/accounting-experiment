@@ -98,7 +98,7 @@ import { InvoiceFormComponent } from '../invoice-form/invoice-form.component';
                 {{ invoice.dueDate | date: 'MMM d, yyyy' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-slate-900">
-                {{ invoice.totalAmount | currency : invoice.currency }}
+                {{ (invoice.totalAmount || 0) | currency:(invoice.currency || 'USD') }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                 <span [ngClass]="{

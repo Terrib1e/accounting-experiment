@@ -25,7 +25,7 @@
         <th mat-header-cell *matHeaderCellDef>Stages</th>
         <td mat-cell *matCellDef="let workflow">
           <mat-chip-set>
-            <mat-chip *ngFor="let stage of workflow.stages" [class.initial]="stage.isInitial" [class.final]="stage.isFinal">
+            <mat-chip *ngFor="let stage of workflow.stages" [class.initial]="stage.initial" [class.final]="stage.finalStage">
               {{ stage.name }}
             </mat-chip>
           </mat-chip-set>
