@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-09T14:16:58-0500",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Amazon.com Inc.)"
+    date = "2026-01-09T21:19:00-0500",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.45.0.v20260101-2150, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 @Component
 public class AccountMapperImpl implements AccountMapper {
@@ -22,15 +22,15 @@ public class AccountMapperImpl implements AccountMapper {
 
         AccountDto accountDto = new AccountDto();
 
-        accountDto.setId( account.getId() );
-        accountDto.setCode( account.getCode() );
-        accountDto.setName( account.getName() );
-        accountDto.setDescription( account.getDescription() );
-        accountDto.setType( account.getType() );
-        accountDto.setSubtype( account.getSubtype() );
-        accountDto.setParentAccountId( account.getParentAccountId() );
         accountDto.setActive( account.isActive() );
+        accountDto.setCode( account.getCode() );
         accountDto.setCurrency( account.getCurrency() );
+        accountDto.setDescription( account.getDescription() );
+        accountDto.setId( account.getId() );
+        accountDto.setName( account.getName() );
+        accountDto.setParentAccountId( account.getParentAccountId() );
+        accountDto.setSubtype( account.getSubtype() );
+        accountDto.setType( account.getType() );
 
         return accountDto;
     }
@@ -44,14 +44,14 @@ public class AccountMapperImpl implements AccountMapper {
         Account account = new Account();
 
         account.setId( dto.getId() );
-        account.setCode( dto.getCode() );
-        account.setName( dto.getName() );
-        account.setDescription( dto.getDescription() );
-        account.setType( dto.getType() );
-        account.setSubtype( dto.getSubtype() );
-        account.setParentAccountId( dto.getParentAccountId() );
         account.setActive( dto.isActive() );
+        account.setCode( dto.getCode() );
         account.setCurrency( dto.getCurrency() );
+        account.setDescription( dto.getDescription() );
+        account.setName( dto.getName() );
+        account.setParentAccountId( dto.getParentAccountId() );
+        account.setSubtype( dto.getSubtype() );
+        account.setType( dto.getType() );
 
         return account;
     }
@@ -64,12 +64,12 @@ public class AccountMapperImpl implements AccountMapper {
 
         AccountHierarchyDto accountHierarchyDto = new AccountHierarchyDto();
 
-        accountHierarchyDto.setId( account.getId() );
         accountHierarchyDto.setCode( account.getCode() );
+        accountHierarchyDto.setId( account.getId() );
         accountHierarchyDto.setName( account.getName() );
-        accountHierarchyDto.setType( account.getType() );
-        accountHierarchyDto.setSubtype( account.getSubtype() );
         accountHierarchyDto.setParentAccountId( account.getParentAccountId() );
+        accountHierarchyDto.setSubtype( account.getSubtype() );
+        accountHierarchyDto.setType( account.getType() );
 
         return accountHierarchyDto;
     }

@@ -295,13 +295,17 @@ export class ExpenseFormComponent implements OnInit {
   onSubmit(): void {
     if (this.form.valid) {
         const value = this.form.value;
+        const { vendorId, ...rest } = value;
         const payload = {
-            ...value,
-            vendor: { id: value.vendorId },
-            lines: value.lines.map((l: any) => ({
-                ...l,
-                expenseAccount: { id: l.expenseAccountId }
-            }))
+            ...rest,
+            vendor: { id: vendorId },
+            lines: value.lines.map((l: any) => {
+                const { expenseAccountId, ...lineRest } = l;
+                return {
+                    ...lineRest,
+                    expenseAccount: { id: expenseAccountId }
+                };
+            })
         };
         this.dialogRef.close(payload);
     }

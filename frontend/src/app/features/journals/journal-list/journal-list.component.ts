@@ -46,7 +46,7 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let entry of entries" class="group">
+            <tr *ngFor="let entry of entries" (click)="viewEntryDetails(entry)" class="group cursor-pointer">
               <td class="whitespace-nowrap font-medium text-slate-500">
                 {{ entry.entryDate | date: 'MMM d, yyyy' }}
               </td>
@@ -69,7 +69,7 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
                    <span>{{ entry.status }}</span>
                  </span>
               </td>
-              <td class="whitespace-nowrap text-right">
+              <td class="whitespace-nowrap text-right" (click)="$event.stopPropagation()">
                 <div class="flex items-center justify-end space-x-1">
                   <app-button *ngIf="entry.status === 'DRAFT'"
                           variant="ghost" size="sm" icon="check_circle"
@@ -159,6 +159,10 @@ export class JournalListComponent implements OnInit {
               }
           }
       });
+  }
+
+  viewEntryDetails(entry: JournalEntry) {
+    this.openCreateModal(entry);
   }
 
   approveEntry(entry: JournalEntry) {

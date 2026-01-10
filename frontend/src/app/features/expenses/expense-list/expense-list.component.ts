@@ -64,7 +64,8 @@ import { MatIconModule } from '@angular/material/icon';
           </thead>
           <tbody class="bg-white divide-y divide-slate-100">
             <tr *ngFor="let expense of expenses"
-                class="hover:bg-primary-50/30 transition-colors duration-150">
+                (click)="viewExpenseDetails(expense)"
+                class="hover:bg-primary-50/30 transition-colors duration-150 cursor-pointer">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                 {{ expense.date | date: 'MMM d, yyyy' }}
               </td>
@@ -96,7 +97,7 @@ import { MatIconModule } from '@angular/material/icon';
                    {{ expense.status }}
                  </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2" (click)="$event.stopPropagation()">
                 <button *ngIf="expense.status === 'DRAFT'"
                         (click)="approve(expense)"
                         class="px-3 py-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all font-semibold">
@@ -270,6 +271,10 @@ export class ExpenseListComponent implements OnInit, OnDestroy {
          }
        }
     });
+  }
+
+  viewExpenseDetails(expense: Expense) {
+    this.openCreateModal(expense);
   }
 
   approve(expense: Expense) {

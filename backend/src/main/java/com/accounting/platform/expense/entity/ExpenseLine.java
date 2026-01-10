@@ -32,4 +32,11 @@ public class ExpenseLine {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "expense_account_id", nullable = false)
     private Account expenseAccount;
+
+    public void setAccountId(UUID accountId) {
+       if (accountId != null) {
+           this.expenseAccount = new Account();
+           this.expenseAccount.setId(accountId);
+       }
+    }
 }

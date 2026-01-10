@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-09T14:16:58-0500",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Amazon.com Inc.)"
+    date = "2026-01-09T21:19:00-0500",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.45.0.v20260101-2150, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 @Component
 public class JobMapperImpl implements JobMapper {
@@ -31,10 +31,10 @@ public class JobMapperImpl implements JobMapper {
         jobDto.setCurrentStageName( jobCurrentStageName( job ) );
         jobDto.setContactId( jobContactId( job ) );
         jobDto.setContactName( jobContactName( job ) );
+        jobDto.setAssigneeId( job.getAssigneeId() );
+        jobDto.setDueDate( job.getDueDate() );
         jobDto.setId( job.getId() );
         jobDto.setName( job.getName() );
-        jobDto.setDueDate( job.getDueDate() );
-        jobDto.setAssigneeId( job.getAssigneeId() );
 
         return jobDto;
     }
@@ -48,9 +48,9 @@ public class JobMapperImpl implements JobMapper {
         Job job = new Job();
 
         job.setId( dto.getId() );
-        job.setName( dto.getName() );
-        job.setDueDate( dto.getDueDate() );
         job.setAssigneeId( dto.getAssigneeId() );
+        job.setDueDate( dto.getDueDate() );
+        job.setName( dto.getName() );
 
         return job;
     }

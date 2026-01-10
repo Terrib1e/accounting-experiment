@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-09T14:16:58-0500",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Amazon.com Inc.)"
+    date = "2026-01-09T21:19:00-0500",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.45.0.v20260101-2150, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 @Component
 public class DocumentMapperImpl implements DocumentMapper {
@@ -28,15 +28,15 @@ public class DocumentMapperImpl implements DocumentMapper {
         documentDto.setJobName( documentJobName( document ) );
         documentDto.setContactId( documentContactId( document ) );
         documentDto.setContactName( documentContactName( document ) );
-        documentDto.setId( document.getId() );
-        documentDto.setFilename( document.getFilename() );
-        documentDto.setOriginalFilename( document.getOriginalFilename() );
-        documentDto.setContentType( document.getContentType() );
-        documentDto.setFileSize( document.getFileSize() );
-        documentDto.setDescription( document.getDescription() );
         documentDto.setCategory( document.getCategory() );
-        documentDto.setUploadedBy( document.getUploadedBy() );
+        documentDto.setContentType( document.getContentType() );
         documentDto.setCreatedAt( document.getCreatedAt() );
+        documentDto.setDescription( document.getDescription() );
+        documentDto.setFileSize( document.getFileSize() );
+        documentDto.setFilename( document.getFilename() );
+        documentDto.setId( document.getId() );
+        documentDto.setOriginalFilename( document.getOriginalFilename() );
+        documentDto.setUploadedBy( document.getUploadedBy() );
 
         return documentDto;
     }

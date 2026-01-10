@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-09T14:16:58-0500",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Amazon.com Inc.)"
+    date = "2026-01-09T21:19:00-0500",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.45.0.v20260101-2150, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 @Component
 public class WorkflowMapperImpl implements WorkflowMapper {
@@ -24,9 +24,9 @@ public class WorkflowMapperImpl implements WorkflowMapper {
 
         WorkflowDto workflowDto = new WorkflowDto();
 
+        workflowDto.setDescription( workflow.getDescription() );
         workflowDto.setId( workflow.getId() );
         workflowDto.setName( workflow.getName() );
-        workflowDto.setDescription( workflow.getDescription() );
         workflowDto.setStages( workflowStageListToWorkflowStageDtoList( workflow.getStages() ) );
 
         return workflowDto;
@@ -41,8 +41,8 @@ public class WorkflowMapperImpl implements WorkflowMapper {
         Workflow workflow = new Workflow();
 
         workflow.setId( dto.getId() );
-        workflow.setName( dto.getName() );
         workflow.setDescription( dto.getDescription() );
+        workflow.setName( dto.getName() );
         workflow.setStages( workflowStageDtoListToWorkflowStageList( dto.getStages() ) );
 
         return workflow;
@@ -56,11 +56,11 @@ public class WorkflowMapperImpl implements WorkflowMapper {
 
         WorkflowDto.WorkflowStageDto workflowStageDto = new WorkflowDto.WorkflowStageDto();
 
+        workflowStageDto.setFinalStage( stage.isFinalStage() );
         workflowStageDto.setId( stage.getId() );
+        workflowStageDto.setInitial( stage.isInitial() );
         workflowStageDto.setName( stage.getName() );
         workflowStageDto.setOrderIndex( stage.getOrderIndex() );
-        workflowStageDto.setInitial( stage.isInitial() );
-        workflowStageDto.setFinalStage( stage.isFinalStage() );
 
         return workflowStageDto;
     }
@@ -74,10 +74,10 @@ public class WorkflowMapperImpl implements WorkflowMapper {
         WorkflowStage workflowStage = new WorkflowStage();
 
         workflowStage.setId( dto.getId() );
+        workflowStage.setFinalStage( dto.isFinalStage() );
+        workflowStage.setInitial( dto.isInitial() );
         workflowStage.setName( dto.getName() );
         workflowStage.setOrderIndex( dto.getOrderIndex() );
-        workflowStage.setInitial( dto.isInitial() );
-        workflowStage.setFinalStage( dto.isFinalStage() );
 
         return workflowStage;
     }

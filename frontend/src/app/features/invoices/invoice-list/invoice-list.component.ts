@@ -77,7 +77,8 @@ import { InvoiceFormComponent } from '../invoice-form/invoice-form.component';
           </thead>
           <tbody class="bg-white divide-y divide-slate-100">
             <tr *ngFor="let invoice of invoices"
-                class="hover:bg-primary-50/30 transition-colors duration-150">
+                (click)="viewInvoiceDetails(invoice)"
+                class="hover:bg-primary-50/30 transition-colors duration-150 cursor-pointer">
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="text-sm font-semibold text-primary-600 hover:text-primary-700 cursor-pointer">
                   {{ invoice.invoiceNumber }}
@@ -115,7 +116,7 @@ import { InvoiceFormComponent } from '../invoice-form/invoice-form.component';
                   {{ invoice.status }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2" (click)="$event.stopPropagation()">
                 <button *ngIf="invoice.status === 'DRAFT'"
                         (click)="approve(invoice)"
                         class="px-3 py-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all font-semibold">
@@ -302,6 +303,10 @@ export class InvoiceListComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  viewInvoiceDetails(invoice: Invoice) {
+    this.openCreateModal(invoice);
   }
 
   approve(invoice: Invoice) {
